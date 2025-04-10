@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './stylesComp.css';
+import './FileOperations.css';
 import storageService from '../services/storageService';
 
 const FileOperations = ({ 

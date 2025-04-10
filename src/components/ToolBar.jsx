@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import './stylesComp.css';
+import './ToolBar.css';
 
 const ToolBar = ({ 
   onStyleChange, 

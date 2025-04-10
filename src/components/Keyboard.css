@@ -1,0 +1,55 @@
+  /* Keyboard.css */
+  .keyboard {
+    display: flex;
+    flex-direction: column;
+    background-color: #d0d0d0;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .keyboard-row {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+  }
+  
+  .keyboard-key {
+    min-width: 30px;
+    height: 40px;
+    margin: 0 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid #aaa;
+    border-radius: 4px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.1s;
+  }
+  
+  .keyboard-key:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .keyboard-key:active {
+    background-color: #e0e0e0;
+    transform: translateY(2px);
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .space-key {
+    min-width: 240px;
+  }
+  
+  .delete-key {
+    min-width: 60px;
+    background-color: #ff6b6b;
+    color: white;
+  }
+  
+  .delete-key:hover {
+    background-color: #ff5252;
+  }

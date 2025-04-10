@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './stylesComp.css';
+import './UserAuth.css';
 import storageService from '../services/storageService';
 
 const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {

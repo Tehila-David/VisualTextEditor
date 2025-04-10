@@ -1,5 +1,5 @@
 import React from 'react';
-import './stylesComp.css';
+import './TextDisplay.css';
 
 const TextDisplay = ({ text, style }) => {
   return (

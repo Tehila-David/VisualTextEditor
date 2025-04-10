@@ -1,0 +1,7 @@
+
+  /* TextEditor.css */
+  .text-editor {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }

@@ -1,5 +1,5 @@
 import React from 'react';
-import './stylesComp.css';
+import './TextEditor.css';
 import ToolBar from './ToolBar';
 import Keyboard from './Keyboard';
 

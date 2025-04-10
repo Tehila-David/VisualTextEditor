@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import './components/stylesComp.css';
+import './App.css';
 import MultiTextDisplay from './components/MultiTextDisplay';
 import TextEditor from './components/TextEditor';
 import Keyboard from './components/Keyboard';

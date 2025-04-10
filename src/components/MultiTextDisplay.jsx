@@ -1,5 +1,5 @@
 import React from 'react';
-import './stylesComp.css';
+import './MultiTextDisplay.css';
 
 const MultiTextDisplay = ({ 
   documents, 
