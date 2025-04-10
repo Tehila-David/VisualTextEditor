@@ -2,8 +2,6 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import MultiTextDisplay from './components/MultiTextDisplay';
 import TextEditor from './components/TextEditor';
-import Keyboard from './components/Keyboard';
-import ToolBar from './components/ToolBar';
 import FileOperations from './components/FileOperations';
 import UserAuth from './components/UserAuth';
 
@@ -53,8 +51,11 @@ function App() {
   useEffect(() => {
     if (documents.length > 0 && activeDocumentIndex >= 0) {
       const currentDoc = documents[activeDocumentIndex];
-      if (currentDoc.content !== '' && (historyIndex === -1 || history[historyIndex]?.content !== currentDoc.content)) {
-        const newHistory = history.slice(0, historyIndex + 1);
+      if (historyIndex === -1 || 
+          history.length === 0 || 
+          (history[historyIndex]?.content !== currentDoc.content)) {
+        // יצירת היסטוריה חדשה רק אם התוכן השתנה
+        const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
         newHistory.push({ ...currentDoc });
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
@@ -145,16 +146,40 @@ function App() {
   const deleteWord = () => {
     if (activeDocumentIndex >= 0) {
       const currentDoc = documents[activeDocumentIndex];
-      const words = currentDoc.content.split(' ');
-      if (words.length > 0) {
-        words.pop();
-        const newDocuments = [...documents];
-        newDocuments[activeDocumentIndex] = {
-          ...newDocuments[activeDocumentIndex],
-          content: words.join(' ')
-        };
-        setDocuments(newDocuments);
+      const content = currentDoc.content;
+      
+      // מחיקת המילה האחרונה בהתחשב ברווחים
+      let newContent;
+      
+      // בדיקה אם המסמך מסתיים ברווח
+      if (content.endsWith(' ')) {
+        // מחיקת הרווחים בסוף
+        const trimmedContent = content.trimEnd();
+        // מציאת הרווח האחרון
+        const lastSpaceIndex = trimmedContent.lastIndexOf(' ');
+        if (lastSpaceIndex !== -1) {
+          newContent = content.substring(0, lastSpaceIndex + 1);
+        } else {
+          // אם אין רווח נוסף, נמחק הכל
+          newContent = '';
+        }
+      } else {
+        // אם אין רווח בסוף, נמצא את הרווח האחרון
+        const lastSpaceIndex = content.lastIndexOf(' ');
+        if (lastSpaceIndex !== -1) {
+          newContent = content.substring(0, lastSpaceIndex + 1);
+        } else {
+          // אם אין רווח בכלל, נמחק הכל
+          newContent = '';
+        }
       }
+      
+      const newDocuments = [...documents];
+      newDocuments[activeDocumentIndex] = {
+        ...newDocuments[activeDocumentIndex],
+        content: newContent
+      };
+      setDocuments(newDocuments);
     }
   };
 
@@ -175,7 +200,30 @@ function App() {
   // פונקציה לשינוי סגנון הטקסט במסמך הפעיל
   const changeStyle = (style) => {
     if (activeDocumentIndex >= 0) {
+      // טיפול מיוחד בתכונות טוגל כמו עיבוי, הטיה וקו תחתון
       const newStyle = { ...currentStyle, ...style };
+      
+      // טיפול בטוגל של עיבוי
+      if (style.hasOwnProperty('fontWeight')) {
+        if (style.fontWeight === currentStyle.fontWeight) {
+          newStyle.fontWeight = 'normal';
+        }
+      }
+      
+      // טיפול בטוגל של הטיה
+      if (style.hasOwnProperty('fontStyle')) {
+        if (style.fontStyle === currentStyle.fontStyle) {
+          newStyle.fontStyle = 'normal';
+        }
+      }
+      
+      // טיפול בטוגל של קו תחתון
+      if (style.hasOwnProperty('textDecoration')) {
+        if (style.textDecoration === currentStyle.textDecoration) {
+          newStyle.textDecoration = 'none';
+        }
+      }
+      
       setCurrentStyle(newStyle);
       
       const newDocuments = [...documents];
@@ -243,27 +291,47 @@ function App() {
     }
   };
 
-  // פונקציה לחיפוש תו בטקסט
-  const searchCharacter = (char) => {
-    if (activeDocumentIndex >= 0) {
+  // פונקציה לחיפוש טקסט במסמך
+  const searchText = (searchTerm) => {
+    if (activeDocumentIndex >= 0 && searchTerm) {
       const currentDoc = documents[activeDocumentIndex];
-      return currentDoc.content.includes(char) ? currentDoc.content.indexOf(char) : -1;
+      const position = currentDoc.content.indexOf(searchTerm);
+      
+      if (position !== -1) {
+        alert(`הטקסט "${searchTerm}" נמצא בעמדה ${position}`);
+        return position;
+      } else {
+        alert(`הטקסט "${searchTerm}" לא נמצא במסמך`);
+        return -1;
+      }
     }
     return -1;
   };
 
-  // פונקציה להחלפת תו בטקסט
-  const replaceCharacter = (oldChar, newChar) => {
-    if (activeDocumentIndex >= 0) {
+  // פונקציה להחלפת טקסט במסמך
+  const replaceText = (searchTerm, replaceTerm) => {
+    if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
       const currentDoc = documents[activeDocumentIndex];
-      const newContent = currentDoc.content.replace(new RegExp(oldChar, 'g'), newChar);
       
-      const newDocuments = [...documents];
-      newDocuments[activeDocumentIndex] = {
-        ...newDocuments[activeDocumentIndex],
-        content: newContent
-      };
-      setDocuments(newDocuments);
+      // יצירת ביטוי רגולרי עם דגל global למציאת כל המופעים
+      const regex = new RegExp(searchTerm, 'g');
+      const newContent = currentDoc.content.replace(regex, replaceTerm);
+      
+      // בדיקה אם בוצעה החלפה
+      if (newContent !== currentDoc.content) {
+        const newDocuments = [...documents];
+        newDocuments[activeDocumentIndex] = {
+          ...newDocuments[activeDocumentIndex],
+          content: newContent
+        };
+        setDocuments(newDocuments);
+        
+        // חישוב כמות ההחלפות
+        const count = (currentDoc.content.match(regex) || []).length;
+        alert(`הוחלפו ${count} מופעים של "${searchTerm}" ב-"${replaceTerm}"`);
+      } else {
+        alert(`הטקסט "${searchTerm}" לא נמצא במסמך`);
+      }
     }
   };
 
@@ -303,19 +371,17 @@ function App() {
         />
       </div>
       <div className="editor-container">
-        <ToolBar 
+        <TextEditor 
+          onAddCharacter={addCharacter}
+          onDeleteCharacter={deleteCharacter}
+          onDeleteWord={deleteWord}
+          onClearText={clearText}
           onStyleChange={changeStyle}
           onLanguageChange={changeLanguage}
           currentLanguage={currentLanguage}
           onUndo={undo}
-          onClear={clearText}
-          onDeleteWord={deleteWord}
-          onCreateNew={createNewDocument}
-        />
-        <Keyboard 
-          language={currentLanguage}
-          onAddCharacter={addCharacter}
-          onDeleteCharacter={deleteCharacter}
+          onSearch={searchText}
+          onReplace={replaceText}
         />
       </div>
     </div>

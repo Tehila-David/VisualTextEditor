@@ -1,41 +1,60 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './Keyboard.css';
 
-const Keyboard = ({ language, onAddCharacter, onDeleteCharacter }) => {
-  // מקלדת עברית
-// הגדרת שורות המקלדת העברית ללא שורת רווח
-const hebrewLayout = [
-  ['/', 'י', 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
-  ['ש', 'ד', 'ג', 'כ', 'י', 'ח', 'ל', 'ך', 'ף', 'ר'],
-  ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', '.'],
-  ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-  ['!', '@', '#', '$', '%', '^', '&', '*', ')', '(']
-];
+const Keyboard = ({
+  language,
+  onAddCharacter,
+  onDeleteCharacter,
+  onDeleteWord,
+  onClearText,
+  onUndo,
+  onLanguageChange,
+  currentLanguage,
+  onStyleChange,
+  onSearch,
+  onReplace
+}) => {
+  // מצב לשמירת הסגנונות והצבע הנבחר
+  const [selectedFont, setSelectedFont] = useState('Arial');
+  const [selectedSize, setSelectedSize] = useState('16px');
+  const [selectedColor, setSelectedColor] = useState('#000000');
+  const [boldActive, setBoldActive] = useState(false);
+  const [italicActive, setItalicActive] = useState(false);
+  const [underlineActive, setUnderlineActive] = useState(false);
 
-  // מקלדת אנגלית
+  // מצב לחלונית פעולות מתקדמות
+  const [showAdvanced, setShowAdvanced] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [replaceText, setReplaceText] = useState('');
+
+  // הגדרת מערכי המקלדת
+  const hebrewLayout = [
+    ['/', 'י', 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ'],
+    ['ש', 'ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף'],
+    ['ז', 'ס', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', '.'],
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
+    ['!', '@', '#', '$', '%', '^', '&', '*', ')', '(']
+  ];
+
   const englishLayout = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p'],
     ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';'],
     ['z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/'],
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-    ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')'],
-    
+    ['!', '@', '#', '$', '%', '^', '&', '*', '(', ')']
   ];
 
-  // אימוג'ים
   const emojiLayout = [
     ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '☺️', '😊'],
-    ['😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙'],
-    ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '❣️', '💕', '💞'],
-    ['👍', '👎', '👏', '🙌', '👐', '🤲', '🤝', '👌', '✌️', '🤞'],
-    ['🎉', '🎊', '🎈', '🎂', '🎁', '🎄', '🎃', '🎗️', '🎟️', '🎫']
+    ['🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋'],
+    ['❤️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '❣️'],
+    ['👍', '👌', '👏', '🙌', '🤝', '🙏', '👐', '🤲', '💪', '✌️'],
+    ['🎉', '🎊', '🎂', '🎁', '🎄', '🎃', '🎗️', '🎟️', '🎫', '🏆']
   ];
 
-  // שורה נוספת רק עבור הרווח
-  const spaceRow = [' ']; // רק רווח אחד
-
+  // בחירת המקלדת הנכונה לפי השפה
   let currentLayout;
-  switch(language) {
+  switch (language) {
     case 'english':
       currentLayout = englishLayout;
       break;
@@ -45,29 +64,288 @@ const hebrewLayout = [
     default:
       currentLayout = hebrewLayout;
   }
+
+  // הגדרת אפשרויות גופן, גודל וצבע
+  const fonts = [
+    { value: 'Arial', label: 'Arial' },
+    { value: 'Times New Roman', label: 'Times New Roman' },
+    { value: 'David', label: 'David' },
+    { value: 'Miriam', label: 'Miriam' },
+    { value: 'Courier New', label: 'Courier' }
+  ];
+
+  const sizes = [
+    { value: '12px', label: '12px' },
+    { value: '14px', label: '14px' },
+    { value: '16px', label: '16px' },
+    { value: '18px', label: '18px' },
+    { value: '20px', label: '20px' },
+    { value: '24px', label: '24px' },
+    { value: '32px', label: '32px' }
+  ];
+
+  const colors = [
+    { value: '#000000', label: 'שחור' },
+    { value: '#FF0000', label: 'אדום' },
+    { value: '#00FF00', label: 'ירוק' },
+    { value: '#0000FF', label: 'כחול' },
+    { value: '#FFA500', label: 'כתום' },
+    { value: '#800080', label: 'סגול' },
+    { value: '#A52A2A', label: 'חום' },
+    { value: '#808080', label: 'אפור' }
+  ];
+
+  // פונקציות לטיפול בשינויים
+  const handleFontChange = (e) => {
+    const font = e.target.value;
+    setSelectedFont(font);
+    onStyleChange({ fontFamily: font });
+  };
+
+  const handleSizeChange = (e) => {
+    const size = e.target.value;
+    setSelectedSize(size);
+    onStyleChange({ fontSize: size });
+  };
+
+  const handleColorChange = (color) => {
+    setSelectedColor(color);
+    onStyleChange({ color });
+  };
+
+  const toggleBold = () => {
+    const newState = !boldActive;
+    setBoldActive(newState);
+    onStyleChange({ fontWeight: newState ? 'bold' : 'normal' });
+  };
+
+  const toggleItalic = () => {
+    const newState = !italicActive;
+    setItalicActive(newState);
+    onStyleChange({ fontStyle: newState ? 'italic' : 'normal' });
+  };
+
+  const toggleUnderline = () => {
+    const newState = !underlineActive;
+    setUnderlineActive(newState);
+    onStyleChange({ textDecoration: newState ? 'underline' : 'none' });
+  };
+
+  // פונקציות לפעולות מתקדמות
+  const handleSearch = () => {
+    if (searchText && onSearch) {
+      onSearch(searchText);
+    }
+  };
+
+  const handleReplace = () => {
+    if (searchText && replaceText && onReplace) {
+      onReplace(searchText, replaceText);
+    }
+  };
+
   return (
-    <div className="keyboard">
-      {currentLayout.map((row, rowIndex) => (
-        <div key={`row-${rowIndex}`} className="keyboard-row">
-          {row.map((key, keyIndex) => (
-            <button
-              key={`key-${rowIndex}-${keyIndex}`}
-              className="keyboard-key"
-              onClick={() => onAddCharacter(key)}
+    <div className="keyboard-main">
+      {/* סייד-בר ימני - אפשרויות עיצוב */}
+      <div className="right-sidebar">
+        <div className="style-section">
+          <div className="section-title">גופן</div>
+          <div className="control-row">
+            <select
+              className="select-control"
+              value={selectedFont}
+              onChange={handleFontChange}
             >
-              {key === ' ' ? 'רווח' : key}
-            </button>
-          ))}
+              {fonts.map(font => (
+                <option key={font.value} value={font.value}>{font.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
-      ))}
-      {/* שורת הרווח */}
-      <div className="keyboard-row">
-        <button
-          className="keyboard-key space-key"
-          onClick={() => onAddCharacter(' ')}
-        >
-          רווח
-        </button>
+
+        <div className="style-section">
+          <div className="section-title">גודל</div>
+          <div className="control-row">
+            <select
+              className="select-control"
+              value={selectedSize}
+              onChange={handleSizeChange}
+            >
+              {sizes.map(size => (
+                <option key={size.value} value={size.value}>{size.label}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        <div className="style-section">
+          <div className="section-title">צבע</div>
+          <div className="color-palette">
+            {colors.map(color => (
+              <div
+                key={color.value}
+                className={`color-swatch ${selectedColor === color.value ? 'active' : ''}`}
+                style={{ backgroundColor: color.value }}
+                onClick={() => handleColorChange(color.value)}
+                title={color.label}
+              />
+            ))}
+          </div>
+        </div>
+
+        <div className="style-section">
+          <div className="section-title">סגנון</div>
+          <div className="style-buttons">
+            <button
+              className={`style-button ${boldActive ? 'active' : ''}`}
+              onClick={toggleBold}
+              aria-label="Bold"
+            >
+              <strong>B</strong>
+            </button>
+            <button
+              className={`style-button ${italicActive ? 'active' : ''}`}
+              onClick={toggleItalic}
+              aria-label="Italic"
+            >
+              <i>I</i>
+            </button>
+            <button
+              className={`style-button ${underlineActive ? 'active' : ''}`}
+              onClick={toggleUnderline}
+              aria-label="Underline"
+            >
+              <u>U</u>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* אזור המקלדת */}
+      <div className="keyboard-wrapper">
+        <div className="keyboard">
+          <div className="section-title">המקלדת שלי</div>
+          {currentLayout.map((row, rowIndex) => (
+            <div key={`row-${rowIndex}`} className="keyboard-row">
+              {row.map((key, keyIndex) => (
+                <button
+                  key={`key-${rowIndex}-${keyIndex}`}
+                  className="keyboard-key"
+                  onClick={() => onAddCharacter(key)}
+                  aria-label={key}
+                >
+                  {key}
+                </button>
+              ))}
+            </div>
+          ))}
+          <div className="keyboard-actions">
+            <button
+              className="delete-key"
+              onClick={onDeleteCharacter}
+              aria-label="מחק תו"
+            >
+              מחק
+            </button>
+            <button
+              className="space-key"
+              onClick={() => onAddCharacter(' ')}
+              aria-label="רווח"
+            >
+              רווח
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* סייד-בר שמאלי - פעולות ושפה */}
+      <div className="left-sidebar">
+        <div className="action-section">
+          <div className="section-title">פעולות</div>
+          <button
+            className="action-button delete-word"
+            onClick={onDeleteWord}
+          >
+            מחק מילה
+          </button>
+          <button
+            className="action-button clear-all"
+            onClick={onClearText}
+          >
+            נקה הכל
+          </button>
+          <button
+            className="action-button undo"
+            onClick={onUndo}
+          >
+            ביטול
+          </button>
+          <button
+            className="action-button advanced"
+            onClick={() => setShowAdvanced(!showAdvanced)}
+          >
+            {showAdvanced ? 'הסתר פעולות מתקדמות' : 'פעולות מתקדמות'}
+          </button>
+
+          {/* חלונית פעולות מתקדמות - בתוך הסיידבר */}
+          {showAdvanced && (
+            <div className="advanced-popup">
+              <div className="popup-header">
+                <div className="popup-title">פעולות מתקדמות</div>
+              </div>
+              <div className="popup-content">
+                <div className="advanced-group">
+                  <label>חיפוש:</label>
+                  <div className="input-action">
+                    <input
+                      type="text"
+                      value={searchText}
+                      onChange={(e) => setSearchText(e.target.value)}
+                      placeholder="הקלד טקסט לחיפוש"
+                    />
+                    <button onClick={handleSearch}>חפש</button>
+                  </div>
+                </div>
+
+                <div className="advanced-group">
+                  <label>החלפה:</label>
+                  <div className="input-action">
+                    <input
+                      type="text"
+                      value={replaceText}
+                      onChange={(e) => setReplaceText(e.target.value)}
+                      placeholder="הקלד טקסט להחלפה"
+                    />
+                    <button onClick={handleReplace}>החלף</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+
+
+        <div className="action-section">
+          <div className="section-title">שפה</div>
+          <button
+            className={`language-button ${currentLanguage === 'hebrew' ? 'active' : ''}`}
+            onClick={() => onLanguageChange('hebrew')}
+          >
+            עברית
+          </button>
+          <button
+            className={`language-button ${currentLanguage === 'english' ? 'active' : ''}`}
+            onClick={() => onLanguageChange('english')}
+          >
+            English
+          </button>
+          <button
+            className={`language-button ${currentLanguage === 'emoji' ? 'active' : ''}`}
+            onClick={() => onLanguageChange('emoji')}
+          >
+            אימוג'י
+          </button>
+        </div>
       </div>
     </div>
   );

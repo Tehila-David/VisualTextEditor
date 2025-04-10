@@ -16,7 +16,7 @@
 }
 
 .editor-container {
-  height: 40vh;
+  height: 280px; /* גובה קבוע למקלדת ולחצני עריכה */
   background-color: #f0f0f0;
   border-top: 1px solid #ccc;
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);

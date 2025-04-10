@@ -1,6 +1,5 @@
 import React from 'react';
 import './TextEditor.css';
-import ToolBar from './ToolBar';
 import Keyboard from './Keyboard';
 
 const TextEditor = ({ 
@@ -17,20 +16,18 @@ const TextEditor = ({
 }) => {
   return (
     <div className="text-editor">
-      <ToolBar 
-        onStyleChange={onStyleChange}
-        onLanguageChange={onLanguageChange}
-        currentLanguage={currentLanguage}
-        onUndo={onUndo}
-        onClear={onClearText}
-        onDeleteWord={onDeleteWord}
-        onSearch={onSearch}
-        onReplace={onReplace}
-      />
       <Keyboard 
         language={currentLanguage}
         onAddCharacter={onAddCharacter}
         onDeleteCharacter={onDeleteCharacter}
+        onDeleteWord={onDeleteWord}
+        onClearText={onClearText}
+        onStyleChange={onStyleChange}
+        onLanguageChange={onLanguageChange}
+        currentLanguage={currentLanguage}
+        onUndo={onUndo}
+        onSearch={onSearch}
+        onReplace={onReplace}
       />
     </div>
   );
