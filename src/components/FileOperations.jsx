@@ -6,6 +6,8 @@ const FileOperations = ({
   currentText, 
   currentStyle, 
   onLoadDocument, 
+  onCreateNewDocument, // פרמטר חדש
+  onOpenDocument, // פרמטר חדש
   currentUser = 'default'
 }) => {
   const [documentName, setDocumentName] = useState('');
@@ -49,7 +51,7 @@ const FileOperations = ({
     try {
       const doc = storageService.loadDocument(fileName, currentUser);
       if (doc) {
-        onLoadDocument(doc.content, doc.style);
+        onOpenDocument(doc.content, doc.style, fileName); // שימוש בפונקציה החדשה
         setMessage(`המסמך "${fileName}" נטען בהצלחה`);
         setShowOpenDialog(false);
         setTimeout(() => setMessage(''), 3000);
@@ -79,17 +81,9 @@ const FileOperations = ({
     }
   };
 
-  // יצירת מסמך חדש
-  const createNewDocument = () => {
-    onLoadDocument('', { 
-      fontFamily: 'Arial',
-      fontSize: '16px',
-      color: '#000000',
-      fontWeight: 'normal',
-      fontStyle: 'normal',
-      textDecoration: 'none',
-      direction: 'rtl'
-    });
+  // יצירת מסמך חדש - פונקציית מעטפת חדשה
+  const handleCreateNew = () => {
+    onCreateNewDocument(); // קריאה לפונקציה החיצונית
     setMessage('נוצר מסמך חדש');
     setTimeout(() => setMessage(''), 3000);
   };
@@ -99,7 +93,7 @@ const FileOperations = ({
       <div className="file-buttons">
         <button 
           className="file-button" 
-          onClick={createNewDocument}
+          onClick={handleCreateNew} // שינוי כאן - קריאה לפונקציה החדשה
           title="מסמך חדש"
         >
           חדש

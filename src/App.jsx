@@ -8,13 +8,13 @@ import UserAuth from './components/UserAuth';
 function App() {
   // מצב עבור המשתמש הנוכחי
   const [currentUser, setCurrentUser] = useState(null);
-  
+
   // מצב עבור מסמכים פתוחים
   const [documents, setDocuments] = useState([]);
-  
+
   // אינדקס של המסמך הפעיל כרגע
   const [activeDocumentIndex, setActiveDocumentIndex] = useState(-1);
-  
+
   // מצב עבור הסגנון הנוכחי של המסמך הפעיל
   const [currentStyle, setCurrentStyle] = useState({
     fontFamily: 'Arial',
@@ -28,7 +28,7 @@ function App() {
 
   // מצב עבור שפת המקלדת הנוכחית
   const [currentLanguage, setCurrentLanguage] = useState('hebrew');
-  
+
   // היסטוריית פעולות לטובת undo
   const [history, setHistory] = useState([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
@@ -51,9 +51,9 @@ function App() {
   useEffect(() => {
     if (documents.length > 0 && activeDocumentIndex >= 0) {
       const currentDoc = documents[activeDocumentIndex];
-      if (historyIndex === -1 || 
-          history.length === 0 || 
-          (history[historyIndex]?.content !== currentDoc.content)) {
+      if (historyIndex === -1 ||
+        history.length === 0 ||
+        (history[historyIndex]?.content !== currentDoc.content)) {
         // יצירת היסטוריה חדשה רק אם התוכן השתנה
         const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
         newHistory.push({ ...currentDoc });
@@ -63,6 +63,19 @@ function App() {
     }
   }, [documents]);
 
+  // פונקציה חדשה לפתיחת מסמך כמסמך חדש
+  const openNewDocument = (content, style, name) => {
+    const newDocument = {
+      name: name || `מסמך ${documents.length + 1}`,
+      content,
+      style
+    };
+
+    setDocuments([...documents, newDocument]);
+    setActiveDocumentIndex(documents.length);
+    setCurrentStyle(style);
+  };
+
   // פונקציה ליצירת מסמך חדש
   const createNewDocument = () => {
     const newDocument = {
@@ -70,7 +83,7 @@ function App() {
       content: '',
       style: { ...currentStyle }
     };
-    
+
     setDocuments([...documents, newDocument]);
     setActiveDocumentIndex(documents.length);
   };
@@ -82,38 +95,38 @@ function App() {
     }
   };
 
-  // פונקציה לסגירת מסמך
-  const closeDocument = (index) => {
-    // בדיקה אם יש תוכן במסמך ולהציע לשמור אותו
-    const documentToClose = documents[index];
-    if (documentToClose.content && !window.confirm(`האם אתה בטוח שברצונך לסגור את "${documentToClose.name}"? שינויים שלא נשמרו יאבדו.`)) {
-      return;
-    }
-    
-    const newDocuments = [...documents];
-    newDocuments.splice(index, 1);
-    
-    setDocuments(newDocuments);
-    
-    // אם סגרנו את המסמך הפעיל, נעבור למסמך הבא או הקודם
-    if (index === activeDocumentIndex) {
-      if (newDocuments.length > 0) {
-        // אם סגרנו את המסמך האחרון, נבחר את המסמך האחרון החדש
-        if (index >= newDocuments.length) {
-          setActiveDocumentIndex(newDocuments.length - 1);
-        } else {
-          setActiveDocumentIndex(index);
-        }
+ 
+ // פונקציה לסגירת מסמך
+const closeDocument = (index) => {
+  // בדיקה אם יש תוכן במסמך ולהציע לשמור אותו
+  const documentToClose = documents[index];
+  if (documentToClose.content && !window.confirm(`האם אתה בטוח שברצונך לסגור את "${documentToClose.name}"? שינויים שלא נשמרו יאבדו.`)) {
+    return;
+  }
+  
+  const newDocuments = [...documents];
+  newDocuments.splice(index, 1);
+  
+  setDocuments(newDocuments);
+  
+  // אם סגרנו את המסמך הפעיל, נעבור למסמך הבא או הקודם
+  if (index === activeDocumentIndex) {
+    if (newDocuments.length > 0) {
+      // אם סגרנו את המסמך האחרון, נבחר את המסמך האחרון החדש
+      if (index >= newDocuments.length) {
+        setActiveDocumentIndex(newDocuments.length - 1);
       } else {
-        setActiveDocumentIndex(-1);
-        // אם אין יותר מסמכים, ניצור אחד חדש
-        createNewDocument();
+        setActiveDocumentIndex(index);
       }
-    } else if (index < activeDocumentIndex) {
-      // אם המסמך שנסגר היה לפני המסמך הפעיל, נעדכן את האינדקס
-      setActiveDocumentIndex(activeDocumentIndex - 1);
+    } else {
+      setActiveDocumentIndex(-1);
+      // הערה: הסרנו את השורה שיוצרת מסמך חדש
     }
-  };
+  } else if (index < activeDocumentIndex) {
+    // אם המסמך שנסגר היה לפני המסמך הפעיל, נעדכן את האינדקס
+    setActiveDocumentIndex(activeDocumentIndex - 1);
+  }
+};
 
   // פונקציה להוספת תו לטקסט במסמך הפעיל
   const addCharacter = (char) => {
@@ -147,10 +160,10 @@ function App() {
     if (activeDocumentIndex >= 0) {
       const currentDoc = documents[activeDocumentIndex];
       const content = currentDoc.content;
-      
+
       // מחיקת המילה האחרונה בהתחשב ברווחים
       let newContent;
-      
+
       // בדיקה אם המסמך מסתיים ברווח
       if (content.endsWith(' ')) {
         // מחיקת הרווחים בסוף
@@ -173,7 +186,7 @@ function App() {
           newContent = '';
         }
       }
-      
+
       const newDocuments = [...documents];
       newDocuments[activeDocumentIndex] = {
         ...newDocuments[activeDocumentIndex],
@@ -202,30 +215,30 @@ function App() {
     if (activeDocumentIndex >= 0) {
       // טיפול מיוחד בתכונות טוגל כמו עיבוי, הטיה וקו תחתון
       const newStyle = { ...currentStyle, ...style };
-      
+
       // טיפול בטוגל של עיבוי
       if (style.hasOwnProperty('fontWeight')) {
         if (style.fontWeight === currentStyle.fontWeight) {
           newStyle.fontWeight = 'normal';
         }
       }
-      
+
       // טיפול בטוגל של הטיה
       if (style.hasOwnProperty('fontStyle')) {
         if (style.fontStyle === currentStyle.fontStyle) {
           newStyle.fontStyle = 'normal';
         }
       }
-      
+
       // טיפול בטוגל של קו תחתון
       if (style.hasOwnProperty('textDecoration')) {
         if (style.textDecoration === currentStyle.textDecoration) {
           newStyle.textDecoration = 'none';
         }
       }
-      
+
       setCurrentStyle(newStyle);
-      
+
       const newDocuments = [...documents];
       newDocuments[activeDocumentIndex] = {
         ...newDocuments[activeDocumentIndex],
@@ -238,7 +251,7 @@ function App() {
   // פונקציה לשינוי שפת המקלדת
   const changeLanguage = (language) => {
     setCurrentLanguage(language);
-    
+
     // שינוי כיוון הטקסט בהתאם לשפה
     let direction = currentStyle.direction;
     if (language === 'hebrew') {
@@ -246,7 +259,7 @@ function App() {
     } else if (language === 'english') {
       direction = 'ltr';
     }
-    
+
     changeStyle({ direction });
   };
 
@@ -255,10 +268,10 @@ function App() {
     if (historyIndex > 0 && activeDocumentIndex >= 0) {
       const newIndex = historyIndex - 1;
       const previousState = history[newIndex];
-      
+
       const newDocuments = [...documents];
       newDocuments[activeDocumentIndex] = { ...previousState };
-      
+
       setDocuments(newDocuments);
       setCurrentStyle(previousState.style);
       setHistoryIndex(newIndex);
@@ -284,7 +297,7 @@ function App() {
         content,
         style
       };
-      
+
       setDocuments([...documents, newDocument]);
       setActiveDocumentIndex(documents.length);
       setCurrentStyle(style);
@@ -296,7 +309,7 @@ function App() {
     if (activeDocumentIndex >= 0 && searchTerm) {
       const currentDoc = documents[activeDocumentIndex];
       const position = currentDoc.content.indexOf(searchTerm);
-      
+
       if (position !== -1) {
         alert(`הטקסט "${searchTerm}" נמצא בעמדה ${position}`);
         return position;
@@ -312,11 +325,11 @@ function App() {
   const replaceText = (searchTerm, replaceTerm) => {
     if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
       const currentDoc = documents[activeDocumentIndex];
-      
+
       // יצירת ביטוי רגולרי עם דגל global למציאת כל המופעים
       const regex = new RegExp(searchTerm, 'g');
       const newContent = currentDoc.content.replace(regex, replaceTerm);
-      
+
       // בדיקה אם בוצעה החלפה
       if (newContent !== currentDoc.content) {
         const newDocuments = [...documents];
@@ -325,7 +338,7 @@ function App() {
           content: newContent
         };
         setDocuments(newDocuments);
-        
+
         // חישוב כמות ההחלפות
         const count = (currentDoc.content.match(regex) || []).length;
         alert(`הוחלפו ${count} מופעים של "${searchTerm}" ב-"${replaceTerm}"`);
@@ -351,19 +364,21 @@ function App() {
 
   return (
     <div className="app-container">
-      <UserAuth 
+      <UserAuth
         onUserLogin={handleUserLogin}
         onUserLogout={handleUserLogout}
         currentUser={currentUser}
       />
-      <FileOperations 
+      <FileOperations
         currentText={activeDocumentIndex >= 0 ? documents[activeDocumentIndex].content : ''}
         currentStyle={currentStyle}
         onLoadDocument={(content, style, name) => loadDocument(content, style, name)}
+        onCreateNewDocument={createNewDocument}
+        onOpenDocument={(content, style, name) => openNewDocument(content, style, name)}
         currentUser={currentUser}
       />
       <div className="text-display-container">
-        <MultiTextDisplay 
+        <MultiTextDisplay
           documents={documents}
           activeDocumentIndex={activeDocumentIndex}
           onDocumentSelect={selectDocument}
@@ -371,7 +386,7 @@ function App() {
         />
       </div>
       <div className="editor-container">
-        <TextEditor 
+        <TextEditor
           onAddCharacter={addCharacter}
           onDeleteCharacter={deleteCharacter}
           onDeleteWord={deleteWord}
