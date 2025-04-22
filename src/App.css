@@ -1,23 +1,74 @@
-/* App.css */
+/* App.css - עדכון סופי */
+:root {
+  /* פלטת צבעים מעודכנת שמתאימה לרקע */
+  --beige-light: #e8e3d7;    /* בז' בהיר יותר */
+  --beige-medium: #d9d0c0;   /* בז' בינוני */
+  --beige-dark: #c2b9a7;     /* בז' כהה */
+  --green-light: #d1dac7;    /* ירוק בהיר */
+  --pink-light: #f0d8d2;     /* ורוד בהיר */
+  --brown-light: #a28e76;    /* חום בהיר */
+  --brown-medium: #8a755a;   /* חום בינוני */
+  --brown-dark: #5e4c3a;     /* חום כהה */
+  --black: #232221;
+  
+  /* רדיוסים */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+html, body {
+  background-image: url('/src/background.png');
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  font-family: 'Arial', sans-serif;
+}
+
+#root {
+  height: 100%;
+}
+
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  background-color: #f5f5f5;
-  font-family: 'Arial', sans-serif;
+  height: 100%;
+  padding: 8px;
+  overflow: hidden;
 }
 
 .text-display-container {
   flex: 1;
-  padding: 20px;
-  background-color: white;
-  border-bottom: 1px solid #ccc;
-  overflow: auto;
+  padding: 12px;
+  background-color: rgba(209, 218, 199, 0.2);
+  border-radius: var(--radius-md);
+  margin: 5px 5px 10px 5px;
+  min-height: 150px;
+  max-height: calc(100vh - 400px);
+  box-shadow: 0 2px 10px rgba(94, 76, 58, 0.08);
+  overflow-y: auto;
 }
 
 .editor-container {
-  height: 280px; /* גובה קבוע למקלדת ולחצני עריכה */
-  background-color: #f0f0f0;
-  border-top: 1px solid #ccc;
-  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  background-color: transparent;
+  height: auto;
+  min-height: 240px; /* גובה מינימלי */
+  max-height: 280px;
+  margin: 0 5px 5px 5px;
+  padding-bottom: 15px; /* רווח תחתון למניעת חיתוך */
+  position: relative;
+}
+
+/* התאמה גלובלית */
+* {
+  box-sizing: border-box;
+}
+
+/* התאמות למסכים קטנים */
+@media (max-height: 600px) {
+  .text-display-container {
+    max-height: calc(100vh - 350px);
+    min-height: 120px;
+  }
 }

@@ -1,226 +1,206 @@
-
-/*file-operations*/
+/* FileOperations.css - סופי */
 .file-operations {
-    position: relative;
-    padding: 10px;
-    background-color: #e8e8e8;
-    border-bottom: 1px solid #ccc;
-  }
-  
-  .file-buttons {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .file-button {
-    padding: 5px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.2s;
-  }
-  
-  .file-button:hover {
-    background-color: #0069d9;
-  }
-  
-  .file-message {
-    margin-top: 10px;
-    padding: 5px 10px;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-    border-radius: 4px;
-  }
-  
-  .dialog-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-  }
-  
-  .dialog {
-    width: 300px;
-    padding: 20px;
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  
-  .dialog h3 {
-    margin-top: 0;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  .dialog input {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-  }
-  
-  .dialog-buttons {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-  }
-  
-  .dialog-buttons button {
-    padding: 5px 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-  }
-  
-  .dialog-buttons button:last-child {
-    background-color: #6c757d;
-  }
-  
-  .documents-dialog {
-    width: 400px;
-    max-height: 500px;
-    overflow-y: auto;
-  }
-  
-  .documents-list {
-    list-style: none;
-    padding: 0;
-    margin: 0 0 15px 0;
-  }
-  
-  .documents-list li {
-    padding: 8px 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    cursor: pointer;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  
-  .documents-list li:hover {
-    background-color: #f5f5f5;
-  }
-  
-  .document-name {
-    flex-grow: 1;
-  }
-  
-  .delete-document-button {
-    padding: 2px 6px;
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    border-radius: 50%;
-    cursor: pointer;
-    font-size: 12px;
-    margin-left: 10px;
-  }
-  
-  .delete-document-button:hover {
-    background-color: #c82333;
-  }
-
-  .multi-text-display {
-  height: 100%;
-  overflow: auto;
-  padding: 15px;
+  position: relative;
+  padding: 10px 15px;
+  background-color: rgba(228, 218, 203, 0.85);
+  backdrop-filter: blur(3px);
+  border-bottom: none;
+  box-shadow: 0 2px 5px rgba(94, 76, 58, 0.1);
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 3px;
 }
 
-.empty-state {
+.file-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.file-button {
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background-color: var(--beige-dark);
+  color: var(--brown-dark);
+  cursor: pointer;
+  transition: all 0.3s;
+  box-shadow: 0 2px 4px rgba(94, 76, 58, 0.15);
+}
+
+.file-button:hover {
+  background-color: var(--brown-light);
+  color: var(--beige-light);
+  transform: translateY(-2px);
+  box-shadow: 0 3px 5px rgba(94, 76, 58, 0.2);
+}
+
+/* אייקונים לכפתורים */
+.file-button[title="מסמך חדש"]:before {
+  content: "📄";
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.file-button[title="שמירת מסמך"]:before {
+  content: "💾";
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.file-button[title="פתיחת מסמך"]:before {
+  content: "📂";
+  font-size: 14px;
+  margin-left: 4px;
+}
+
+.file-message {
+  margin-top: 8px;
+  padding: 6px 10px;
+  background-color: rgba(209, 218, 199, 0.3);
+  color: var(--brown-dark);
+  border-left: 3px solid var(--brown-medium);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 13px;
+}
+
+/* דיאלוגים */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(35, 34, 33, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(3px);
+}
+
+.dialog {
+  width: 320px;
+  padding: 20px;
+  background-color: var(--beige-light);
+  border-radius: var(--radius-md);
+  box-shadow: 0 5px 15px rgba(94, 76, 58, 0.15);
+}
+
+.dialog h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+  color: var(--brown-dark);
+  font-size: 18px;
+  font-weight: 600;
+}
+
+.dialog input {
+  width: 100%;
+  padding: 10px 12px;
+  margin-bottom: 15px;
+  border: 1px solid var(--beige-dark);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  background-color: rgba(255, 255, 255, 0.7);
+  color: var(--brown-dark);
+}
+
+.dialog-buttons {
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100%;
-  color: #666;
-  font-size: 16px;
-  text-align: center;
+  gap: 10px;
+  margin-top: 10px;
 }
 
-.documents-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
+.dialog-buttons button {
+  padding: 8px 18px;
+  background-color: var(--brown-medium);
+  color: var(--beige-light);
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  min-width: 80px;
+  transition: all 0.2s;
 }
 
-.document-wrapper {
-  width: calc(50% - 10px);
-  height: 300px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: box-shadow 0.2s, transform 0.2s;
+.dialog-buttons button:hover {
+  background-color: var(--brown-dark);
+  transform: translateY(-1px);
 }
 
-.document-wrapper:hover {
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+.dialog-buttons button:last-child {
+  background-color: var(--beige-dark);
+  color: var(--brown-dark);
 }
 
-.document-wrapper.active {
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+.dialog-buttons button:last-child:hover {
+  background-color: var(--beige-medium);
 }
 
-.document-header {
+/* דיאלוג מסמכים */
+.documents-dialog {
+  width: 380px;
+  max-height: 450px;
+  overflow-y: auto;
+}
+
+.documents-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 15px 0;
+}
+
+.documents-list li {
+  padding: 10px 12px;
+  border: 1px solid var(--beige-dark);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  cursor: pointer;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 10px;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #ddd;
+  background-color: rgba(255, 255, 255, 0.7);
+  transition: all 0.2s;
 }
 
-.document-title {
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.documents-list li:hover {
+  background-color: var(--beige-medium);
+  border-color: var(--brown-light);
+  transform: translateY(-1px);
 }
 
-.close-document-button {
-  padding: 2px 6px;
-  background-color: #dc3545;
-  color: white;
+.document-name {
+  flex-grow: 1;
+  font-weight: 500;
+  color: var(--brown-dark);
+  font-size: 14px;
+}
+
+.delete-document-button {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--brown-light);
+  color: var(--beige-light);
   border: none;
   border-radius: 50%;
   cursor: pointer;
   font-size: 12px;
+  margin-right: 6px;
+  transition: all 0.2s;
 }
 
-.close-document-button:hover {
-  background-color: #c82333;
-}
-
-.document-content {
-  flex-grow: 1;
-  padding: 15px;
-  overflow: auto;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
-
-/* מותאם למסכים קטנים יותר */
-@media (max-width: 768px) {
-  .document-wrapper {
-    width: 100%;
-  }
+.delete-document-button:hover {
+  background-color: var(--brown-medium);
+  transform: rotate(90deg);
 }
