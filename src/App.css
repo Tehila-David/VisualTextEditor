@@ -1,4 +1,4 @@
-/* App.css - עדכון סופי */
+/* App.css - תיקון ספציפי */
 :root {
   /* פלטת צבעים מעודכנת שמתאימה לרקע */
   --beige-light: #e8e3d7;    /* בז' בהיר יותר */
@@ -30,34 +30,36 @@ html, body {
   height: 100%;
 }
 
+/* שינוי משמעותי - הגדרת app-container */
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100%;
-  padding: 8px;
+  height: 100vh;
   overflow: hidden;
+  box-sizing: border-box;
 }
 
+/* שינוי משמעותי - הגדרה מדויקת לאזור התצוגה */
 .text-display-container {
   flex: 1;
-  padding: 12px;
   background-color: rgba(209, 218, 199, 0.2);
   border-radius: var(--radius-md);
-  margin: 5px 5px 10px 5px;
-  min-height: 150px;
-  max-height: calc(100vh - 400px);
-  box-shadow: 0 2px 10px rgba(94, 76, 58, 0.08);
+  margin: 5px;
+  padding: 10px;
   overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(94, 76, 58, 0.08);
 }
 
+/* שינוי קריטי - גובה מוגדר היטב לאזור המקלדת */
 .editor-container {
-  background-color: transparent;
-  height: auto;
-  min-height: 240px; /* גובה מינימלי */
-  max-height: 280px;
-  margin: 0 5px 5px 5px;
-  padding-bottom: 15px; /* רווח תחתון למניעת חיתוך */
+  height: 250px; /* גובה קבוע */
+  min-height: 0;
+  max-height: none;  
+  margin: 5px;
+  margin-top: 0;
   position: relative;
+  overflow: visible;
+  background-color: transparent;
 }
 
 /* התאמה גלובלית */
@@ -66,9 +68,14 @@ html, body {
 }
 
 /* התאמות למסכים קטנים */
+@media (max-height: 700px) {
+  .editor-container {
+    height: 280px;
+  }
+}
+
 @media (max-height: 600px) {
-  .text-display-container {
-    max-height: calc(100vh - 350px);
-    min-height: 120px;
+  .editor-container {
+    height: 240px;
   }
 }

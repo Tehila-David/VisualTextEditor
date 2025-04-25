@@ -15,7 +15,7 @@ const TextEditor = ({
   onReplace
 }) => {
   return (
-    <div className="text-editor">
+    <div className="text-editor-container">
       <Keyboard 
         language={currentLanguage}
         onAddCharacter={onAddCharacter}
