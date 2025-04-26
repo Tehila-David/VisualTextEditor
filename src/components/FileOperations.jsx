@@ -28,18 +28,18 @@ const FileOperations = ({
   // שמירת מסמך
   const saveDocument = () => {
     if (!documentName.trim()) {
-      showMessage('נא להזין שם למסמך', 'error');
+      showMessage('נא להזין שם פתק', 'error');
       return;
     }
 
     try {
       storageService.saveDocument(documentName, currentText, currentStyle, currentUser);
-      showMessage(`המסמך "${documentName}" נשמר בהצלחה`, 'success');
+      showMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
       setShowSaveDialog(false);
       // טעינה מחדש של רשימת המסמכים אחרי שמירה
       loadDocumentsList();
     } catch (error) {
-      showMessage('שגיאה בשמירת המסמך', 'error');
+      showMessage('שגיאה בשמירת הפתק', 'error');
       console.error('Error saving document:', error);
     }
   };
@@ -50,13 +50,13 @@ const FileOperations = ({
       const doc = storageService.loadDocument(fileName, currentUser);
       if (doc) {
         onOpenDocument(doc.content, doc.style, fileName); // שימוש בפונקציה החדשה
-        showMessage(`המסמך "${fileName}" נטען בהצלחה`, 'success');
+        showMessage(`הפתק "${fileName}" נטען בהצלחה`, 'success');
         setShowOpenDialog(false);
       } else {
-        showMessage(`לא ניתן לטעון את המסמך "${fileName}"`, 'error');
+        showMessage(`לא ניתן לטעון את הפתק "${fileName}"`, 'error');
       }
     } catch (error) {
-      showMessage('שגיאה בטעינת המסמך', 'error');
+      showMessage('שגיאה בטעינת הפתק', 'error');
       console.error('Error loading document:', error);
     }
   };
@@ -65,14 +65,14 @@ const FileOperations = ({
   const deleteDocument = (fileName, event) => {
     event.stopPropagation(); // מניעת הטעינה של המסמך בעת לחיצה על כפתור המחיקה
     
-    if (window.confirm(`האם אתה בטוח שברצונך למחוק את המסמך "${fileName}"?`)) {
+    if (window.confirm(`האם אתה בטוח שברצונך למחוק את הפתק "${fileName}"?`)) {
       try {
         storageService.deleteDocument(fileName, currentUser);
-        showMessage(`המסמך "${fileName}" נמחק בהצלחה`, 'success');
+        showMessage(`הפתק"${fileName}" נמחק בהצלחה`, 'success');
         // טעינה מחדש של רשימת המסמכים אחרי מחיקה
         loadDocumentsList();
       } catch (error) {
-        showMessage('שגיאה במחיקת המסמך', 'error');
+        showMessage('שגיאה במחיקת הפתק', 'error');
         console.error('Error deleting document:', error);
       }
     }
@@ -81,7 +81,7 @@ const FileOperations = ({
   // יצירת מסמך חדש - פונקציית מעטפת חדשה
   const handleCreateNew = () => {
     onCreateNewDocument(); // קריאה לפונקציה החיצונית
-    showMessage('נוצר מסמך חדש', 'success');
+    showMessage('נוצר פתק חדש', 'success');
   };
 
   // פונקציה להצגת הודעות
@@ -99,7 +99,7 @@ const FileOperations = ({
         <button 
           className="file-button" 
           onClick={handleCreateNew} // שינוי כאן - קריאה לפונקציה החדשה
-          title="מסמך חדש"
+          title="פתק חדש"
         >
           חדש
         </button>
@@ -108,7 +108,7 @@ const FileOperations = ({
           onClick={() => {
             setShowSaveDialog(true);
           }}
-          title="שמירת מסמך"
+          title="שמירת פתק"
         >
           שמור
         </button>
@@ -119,7 +119,7 @@ const FileOperations = ({
             loadDocumentsList();
             setShowOpenDialog(true);
           }}
-          title="פתיחת מסמך"
+          title="פתיחת פתק"
         >
           פתח
         </button>
@@ -136,12 +136,12 @@ const FileOperations = ({
       {showSaveDialog && (
         <div className="dialog-overlay" >
           <div className="dialog" >
-            <h3>שמירת מסמך</h3>
+            <h3>שמירת פתק</h3>
             <input
               type="text"
               value={documentName}
               onChange={(e) => setDocumentName(e.target.value)}
-              placeholder="שם המסמך"
+              placeholder="שם פתק"
             />
             <div className="dialog-buttons">
               <button onClick={saveDocument}>שמור</button>
@@ -155,7 +155,7 @@ const FileOperations = ({
       {showOpenDialog && (
         <div className="dialog-overlay" style={{ zIndex: 9999 }}>
           <div className="dialog documents-dialog" style={{ position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
-            <h3>פתיחת מסמך</h3>
+            <h3>פתיחת פתק</h3>
             {documentsList.length > 0 ? (
               <ul className="documents-list">
                 {documentsList.map((fileName) => (
@@ -164,7 +164,7 @@ const FileOperations = ({
                     <button
                       className="delete-document-button"
                       onClick={(e) => deleteDocument(fileName, e)}
-                      title="מחק מסמך"
+                      title="מחק פתק"
                     >
                       ✕
                     </button>
@@ -172,7 +172,7 @@ const FileOperations = ({
                 ))}
               </ul>
             ) : (
-              <p>אין מסמכים שמורים</p>
+              <p>אין פתקים שמורים</p>
             )}
             <div className="dialog-buttons">
               <button onClick={() => setShowOpenDialog(false)}>סגור</button>

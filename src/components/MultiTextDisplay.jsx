@@ -11,7 +11,7 @@ const MultiTextDisplay = ({
     <div className="multi-text-display">
       {documents.length === 0 ? (
         <div className="empty-state">
-          <p>אין מסמכים פתוחים. צור או פתח מסמך כדי להתחיל לעבוד.</p>
+          <p>אין פתקים פתוחים. צור או פתח פתק כדי להתחיל לעבוד.</p>
         </div>
       ) : (
         <div className="documents-container">
@@ -23,7 +23,7 @@ const MultiTextDisplay = ({
             >
               <div className="document-header">
                 <span className="document-title">
-                  {doc.name || `מסמך ${index + 1}`}
+                  {doc.name || `פתק${index + 1}`}
                 </span>
                 <button 
                   className="close-document-button"
@@ -31,16 +31,16 @@ const MultiTextDisplay = ({
                     e.stopPropagation();
                     onDocumentClose(index);
                   }}
-                  title="סגור מסמך"
+                  title="סגור פתק"
                 >
-                  ✕
+                  <i className="fas fa-times" /> 
                 </button>
               </div>
               <div 
                 className="document-content"
                 style={doc.style}
               >
-                {doc.content || 'מסמך ריק'}
+                {doc.content || 'פתק ריק'}
               </div>
             </div>
           ))}

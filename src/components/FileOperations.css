@@ -41,24 +41,6 @@
   box-shadow: 0 3px 5px rgba(94, 76, 58, 0.2);
 }
 
-/* אייקונים לכפתורים */
-.file-button[title="מסמך חדש"]:before {
-  content: "📄";
-  font-size: 14px;
-  margin-left: 4px;
-}
-
-.file-button[title="שמירת מסמך"]:before {
-  content: "💾";
-  font-size: 14px;
-  margin-left: 4px;
-}
-
-.file-button[title="פתיחת מסמך"]:before {
-  content: "📂";
-  font-size: 14px;
-  margin-left: 4px;
-}
 
 /* עיצוב הודעות הבזק בחלק העליון של המסך */
 .flash-message {
