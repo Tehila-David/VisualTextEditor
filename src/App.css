@@ -19,12 +19,14 @@
 
 html, body {
   background-image: url('/src/background.png');
-  height: 100vh;
+  height: 100%;
   margin: 0;
   padding: 0;
-  overflow: hidden;
+  overflow-y: auto; /* תמיד יש סרגל בצד ימין */
   font-family: 'Arial', sans-serif;
 }
+
+
 
 #root {
   height: 100%;
@@ -34,9 +36,9 @@ html, body {
 .app-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden;
+  height: 100vh; /* שיהיה גובה מינימלי */
   box-sizing: border-box;
+  overflow-y: auto;
 }
 
 /* שינוי משמעותי - הגדרה מדויקת לאזור התצוגה */
@@ -58,7 +60,7 @@ html, body {
   margin: 5px;
   margin-top: 0;
   position: relative;
-  overflow: visible;
+  overflow-y: auto;
   background-color: transparent;
 }
 
@@ -79,3 +81,4 @@ html, body {
     height: 240px;
   }
 }
+

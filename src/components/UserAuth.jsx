@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './UserAuth.css';
 import storageService from '../services/storageService';
 
@@ -10,18 +10,15 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' או 'error'
 
-  // בדיקה אם יש משתמש מחובר בטעינת האתר (לוקאל סטורג')
-  useEffect(() => {
-    const savedUser = localStorage.getItem('current-user');
-    if (savedUser) {
-      onUserLogin(savedUser);
-    }
-  }, []);
+  // הערה: הסרנו את useEffect כמבוקש
+  // הלוגיקה של בדיקת משתמש מחובר תתבצע במקום אחר
 
   const handleLogin = (e) => {
     e.preventDefault();
     if (!username || !password) {
       showMessage('יש למלא את כל השדות', 'error');
+      setShowLogin(false); // סגירת החלונית במקרה של שגיאה
+      clearForm();
       return;
     }
 
@@ -34,6 +31,8 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
       clearForm();
     } else {
       showMessage('שם משתמש או סיסמה שגויים', 'error');
+      setShowLogin(false); 
+      clearForm();
     }
   };
 
@@ -41,6 +40,7 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
     e.preventDefault();
     if (!username || !password) {
       showMessage('יש למלא את כל השדות', 'error');
+      setShowRegister(false); 
       return;
     }
 
@@ -48,10 +48,11 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
     if (success) {
       showMessage('הרשמה בוצעה בהצלחה, כעת ניתן להתחבר', 'success');
       setShowRegister(false);
-      setShowLogin(true);
       clearForm();
     } else {
       showMessage('שם המשתמש כבר קיים במערכת', 'error');
+      setShowRegister(false); 
+      clearForm();
     }
   };
 
@@ -106,16 +107,17 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
         </div>
       )}
 
+      {/* הודעת התראה - תוצג בחלק העליון של המסך */}
       {message && (
-        <div className={`auth-message ${messageType}`}>
+        <div className={`auth-message ${messageType} flash-message`}>
           {message}
         </div>
       )}
 
-      {/* טופס התחברות */}
+      {/* טופס התחברות - מתוקן עם מרכוז */}
       {showLogin && (
-        <div className="auth-dialog-overlay">
-          <div className="auth-dialog">
+        <div className="auth-dialog-overlay" >
+          <div className="auth-dialog" >
             <h3>התחברות</h3>
             <form onSubmit={handleLogin}>
               <div className="form-group">
@@ -148,10 +150,10 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
         </div>
       )}
 
-      {/* טופס הרשמה */}
+      {/* טופס הרשמה - מתוקן עם מרכוז */}
       {showRegister && (
-        <div className="auth-dialog-overlay">
-          <div className="auth-dialog">
+        <div className="auth-dialog-overlay" >
+          <div className="auth-dialog" >
             <h3>הרשמה</h3>
             <form onSubmit={handleRegister}>
               <div className="form-group">

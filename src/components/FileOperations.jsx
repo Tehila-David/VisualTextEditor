@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './FileOperations.css';
 import storageService from '../services/storageService';
 
@@ -15,12 +15,10 @@ const FileOperations = ({
   const [showOpenDialog, setShowOpenDialog] = useState(false);
   const [documentsList, setDocumentsList] = useState([]);
   const [message, setMessage] = useState('');
+  const [messageType, setMessageType] = useState(''); // סוג ההודעה: 'success' או 'error'
 
-  // טעינת רשימת מסמכים בעת טעינת הרכיב
-  useEffect(() => {
-    loadDocumentsList();
-  }, [currentUser]);
-
+  // הערה: הסרנו את useEffect - הטעינה תתבצע באופן ישיר בעת פתיחת דיאלוג
+  
   // טעינת רשימת המסמכים של המשתמש הנוכחי
   const loadDocumentsList = () => {
     const list = storageService.getUserDocumentsList(currentUser);
@@ -30,18 +28,18 @@ const FileOperations = ({
   // שמירת מסמך
   const saveDocument = () => {
     if (!documentName.trim()) {
-      setMessage('נא להזין שם למסמך');
+      showMessage('נא להזין שם למסמך', 'error');
       return;
     }
 
     try {
       storageService.saveDocument(documentName, currentText, currentStyle, currentUser);
-      setMessage(`המסמך "${documentName}" נשמר בהצלחה`);
+      showMessage(`המסמך "${documentName}" נשמר בהצלחה`, 'success');
       setShowSaveDialog(false);
+      // טעינה מחדש של רשימת המסמכים אחרי שמירה
       loadDocumentsList();
-      setTimeout(() => setMessage(''), 3000);
     } catch (error) {
-      setMessage('שגיאה בשמירת המסמך');
+      showMessage('שגיאה בשמירת המסמך', 'error');
       console.error('Error saving document:', error);
     }
   };
@@ -52,14 +50,13 @@ const FileOperations = ({
       const doc = storageService.loadDocument(fileName, currentUser);
       if (doc) {
         onOpenDocument(doc.content, doc.style, fileName); // שימוש בפונקציה החדשה
-        setMessage(`המסמך "${fileName}" נטען בהצלחה`);
+        showMessage(`המסמך "${fileName}" נטען בהצלחה`, 'success');
         setShowOpenDialog(false);
-        setTimeout(() => setMessage(''), 3000);
       } else {
-        setMessage(`לא ניתן לטעון את המסמך "${fileName}"`);
+        showMessage(`לא ניתן לטעון את המסמך "${fileName}"`, 'error');
       }
     } catch (error) {
-      setMessage('שגיאה בטעינת המסמך');
+      showMessage('שגיאה בטעינת המסמך', 'error');
       console.error('Error loading document:', error);
     }
   };
@@ -71,11 +68,11 @@ const FileOperations = ({
     if (window.confirm(`האם אתה בטוח שברצונך למחוק את המסמך "${fileName}"?`)) {
       try {
         storageService.deleteDocument(fileName, currentUser);
-        setMessage(`המסמך "${fileName}" נמחק בהצלחה`);
+        showMessage(`המסמך "${fileName}" נמחק בהצלחה`, 'success');
+        // טעינה מחדש של רשימת המסמכים אחרי מחיקה
         loadDocumentsList();
-        setTimeout(() => setMessage(''), 3000);
       } catch (error) {
-        setMessage('שגיאה במחיקת המסמך');
+        showMessage('שגיאה במחיקת המסמך', 'error');
         console.error('Error deleting document:', error);
       }
     }
@@ -84,8 +81,16 @@ const FileOperations = ({
   // יצירת מסמך חדש - פונקציית מעטפת חדשה
   const handleCreateNew = () => {
     onCreateNewDocument(); // קריאה לפונקציה החיצונית
-    setMessage('נוצר מסמך חדש');
-    setTimeout(() => setMessage(''), 3000);
+    showMessage('נוצר מסמך חדש', 'success');
+  };
+
+  // פונקציה להצגת הודעות
+  const showMessage = (text, type) => {
+    setMessage(text);
+    setMessageType(type);
+    setTimeout(() => {
+      setMessage('');
+    }, 3000);
   };
 
   return (
@@ -100,7 +105,9 @@ const FileOperations = ({
         </button>
         <button 
           className="file-button" 
-          onClick={() => setShowSaveDialog(true)}
+          onClick={() => {
+            setShowSaveDialog(true);
+          }}
           title="שמירת מסמך"
         >
           שמור
@@ -108,8 +115,9 @@ const FileOperations = ({
         <button 
           className="file-button" 
           onClick={() => {
-            setShowOpenDialog(true);
+            // טעינת רשימת המסמכים בעת פתיחת הדיאלוג
             loadDocumentsList();
+            setShowOpenDialog(true);
           }}
           title="פתיחת מסמך"
         >
@@ -117,12 +125,17 @@ const FileOperations = ({
         </button>
       </div>
 
-      {message && <div className="file-message">{message}</div>}
+      {/* הודעת התראה - תוצג בחלק העליון של המסך */}
+      {message && (
+        <div className={`file-message ${messageType} flash-message`}>
+          {message}
+        </div>
+      )}
 
       {/* דיאלוג שמירת מסמך */}
       {showSaveDialog && (
-        <div className="dialog-overlay">
-          <div className="dialog">
+        <div className="dialog-overlay" >
+          <div className="dialog" >
             <h3>שמירת מסמך</h3>
             <input
               type="text"
@@ -140,8 +153,8 @@ const FileOperations = ({
 
       {/* דיאלוג פתיחת מסמך */}
       {showOpenDialog && (
-        <div className="dialog-overlay">
-          <div className="dialog documents-dialog">
+        <div className="dialog-overlay" style={{ zIndex: 9999 }}>
+          <div className="dialog documents-dialog" style={{ position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
             <h3>פתיחת מסמך</h3>
             {documentsList.length > 0 ? (
               <ul className="documents-list">
