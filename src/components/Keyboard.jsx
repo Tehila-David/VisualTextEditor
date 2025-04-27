@@ -164,9 +164,9 @@ const Keyboard = ({
     // Ensure emojis are handled correctly
     if (currentLanguage === 'emoji') {
       // Use setTimeout to work around asynchronous state update issues
-      
+
       onAddCharacter(charToAdd);
-     
+
     } else {
       // For regular characters
       onAddCharacter(charToAdd);
@@ -210,16 +210,18 @@ const Keyboard = ({
 
         <div className="style-section">
           <div className="section-title">צבע</div>
-          <div className="color-palette">
-            {colors.map(color => (
-              <div
-                key={color.value}
-                className={`color-swatch ${selectedColor === color.value ? 'active' : ''}`}
-                style={{ backgroundColor: color.value }}
-                onClick={() => handleColorChange(color.value)}
-                title={color.label}
-              />
-            ))}
+          <div className="control-row">
+            <select
+              className="select-control"
+              value={selectedColor}
+              onChange={e => handleColorChange(e.target.value)}
+            >
+              {colors.map(color => (
+                <option key={color.value} value={color.value} style={{ backgroundColor: color.value }}>
+                  {color.label}
+                </option>
+              ))}
+            </select>
           </div>
         </div>
 
@@ -247,13 +249,8 @@ const Keyboard = ({
             >
               <u>U</u>
             </button>
-          </div>
-        </div>
 
-        {/* Style scope buttons */}
-        <div className="style-section">
-          <div className="section-title">תחולת עיצוב</div>
-          <div className="style-scope-buttons">
+            {/* Style scope buttons (Same row as Style buttons) */}
             <button
               className={`style-scope-button ${!applyStyleFromNow ? 'active' : ''}`}
               onClick={() => setStyleScope(false)}
@@ -271,7 +268,6 @@ const Keyboard = ({
           </div>
         </div>
       </div>
-
       {/* Keyboard area */}
       <div className="keyboard-wrapper">
         <div className="keyboard">

@@ -155,7 +155,7 @@ const MultiTextDisplay = ({
                   }}
                   title="סגור פתק"
                 >
-                  ✕
+                 <i className="fas fa-times" /> 
                 </button>
               </div>
               {renderDocumentContent(doc, index)}

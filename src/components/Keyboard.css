@@ -24,13 +24,12 @@
   gap: 4px;
   box-shadow: 0 1px 4px rgba(94, 76, 58, 0.1);
 }
-  
 .style-section {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
-  
+
 .section-title {
   font-size: 12px;
   font-weight: 600;
@@ -40,13 +39,13 @@
   text-align: center;
   margin-bottom: 2px;
 }
-  
+
 .control-row {
   display: flex;
   align-items: center;
   gap: 4px;
 }
-  
+
 .select-control {
   flex: 1;
   padding: 3px 5px;
@@ -57,33 +56,24 @@
   color: var(--brown-dark);
   width: 100%;
   margin-bottom: 3px;
-}
-  
-/* === צבעים === */
-.color-palette {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 4px;
-  margin-top: 3px;
-}
-  
-.color-swatch {
-  width: 16px;
-  height: 16px;
-  border-radius: 50%;
-  cursor: pointer;
-  border: 1px solid var(--beige-dark);
-  transition: transform 0.2s;
+  max-height:30px;/*גבלת גובה הרשימה */
+  overflow-y: auto;  /* הוספת גלילה אם התוכן עולה על הגובה */
 }
 
-.color-swatch:hover {
-  transform: scale(1.1);
+/* סגנון חדש למעבר של הרכיב */
+.select-control:focus {
+  outline: none;
+  border-color: var(--brown-dark);
 }
-  
-.color-swatch.active {
-  box-shadow: 0 0 0 1px var(--beige-light), 0 0 0 2px var(--brown-medium);
+
+.control-row select {
+  display: block;
+  width: 100%;
 }
-  
+
+
+
+
 /* === לחצני עיצוב === */
 .style-buttons {
   display: flex;
@@ -394,21 +384,37 @@
   transform: translateY(-1px);
 }
 
-.style-scope-button.active {
-  background-color: var(--brown-light);
-  color: var(--beige-light);
-  border-color: var(--brown-medium);
-}
+
 
 /* סגנון למיכל שני הכפתורים */
 .style-scope-buttons {
   display: flex;
   gap: 4px;
   margin: 4px 0;
-  width: 80%;
+  width: 40%;
 }
 
 /* סגנון לכפתורי תחולת עיצוב */
+.style-scope-button {
+  flex: 1;
+  padding: 6px 4px;
+  background-color: var(--beige-light);
+  border: 1px solid var(--beige-dark);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brown-dark);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.style-buttons, .style-scope-buttons {
+  display: inline-flex;
+  gap: 10px; /* למרווח בין הכפתורים */
+  align-items: center;
+}
+
 .style-scope-button {
   flex: 1;
   padding: 6px 4px;
