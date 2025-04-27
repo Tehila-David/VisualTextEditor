@@ -399,3 +399,37 @@
   color: var(--beige-light);
   border-color: var(--brown-medium);
 }
+
+/* סגנון למיכל שני הכפתורים */
+.style-scope-buttons {
+  display: flex;
+  gap: 4px;
+  margin: 4px 0;
+  width: 80%;
+}
+
+/* סגנון לכפתורי תחולת עיצוב */
+.style-scope-button {
+  flex: 1;
+  padding: 6px 4px;
+  background-color: var(--beige-light);
+  border: 1px solid var(--beige-dark);
+  border-radius: var(--radius-sm);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--brown-dark);
+  cursor: pointer;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.style-scope-button:hover {
+  background-color: var(--beige-medium);
+  transform: translateY(-1px);
+}
+
+.style-scope-button.active {
+  background-color: var(--brown-light);
+  color: var(--beige-light);
+  border-color: var(--brown-medium);
+}

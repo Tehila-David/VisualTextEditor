@@ -81,4 +81,61 @@ html, body {
     height: 240px;
   }
 }
+.app-message {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: fadeInOut 3s ease;
+  min-width: 300px;
+  text-align: center;
+  direction: rtl;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.app-message.success {
+  background-color: rgba(209, 218, 199, 0.9);
+  color: var(--brown-dark);
+  border-right: 3px solid var(--brown-medium);
+}
+
+.app-message.error {
+  background-color: rgba(195, 142, 142, 0.9);
+  color: #fff;
+  border-right: 3px solid #8B4513;
+}
+
+/* הוספת אייקון לפני ההודעה */
+.app-message.success:before {
+  content: "✅ ";
+  margin-left: 5px;
+}
+
+.app-message.error:before {
+  content: "⚠️ ";
+  margin-left: 5px;
+}
+
+/* סגנון חדש לדיאלוג אישור */
+.confirm-dialog {
+  width: 350px;
+  text-align: center;
+}
+
+.confirm-dialog p {
+  margin: 15px 0;
+  font-size: 15px;
+  color: var(--brown-dark);
+  line-height: 1.4;
+}
 

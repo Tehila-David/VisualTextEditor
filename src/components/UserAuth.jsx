@@ -2,22 +2,35 @@ import React, { useState } from 'react';
 import './UserAuth.css';
 import storageService from '../services/storageService';
 
-const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
+const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [message, setMessage] = useState('');
-  const [messageType, setMessageType] = useState(''); // 'success' או 'error'
+  const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+  
+  // Logout confirmation dialog
+  const [showConfirmLogout, setShowConfirmLogout] = useState(false);
 
-  // הערה: הסרנו את useEffect כמבוקש
-  // הלוגיקה של בדיקת משתמש מחובר תתבצע במקום אחר
+  // Function to open login dialog - exported for external components
+  const openLoginDialog = () => {
+    setShowLogin(true);
+    setShowRegister(false);
+  };
+  
+  // Function to open registration dialog - exported for external components
+  const openRegisterDialog = () => {
+    setShowRegister(true);
+    setShowLogin(false);
+  };
 
+  // Handle login form submission
   const handleLogin = (e) => {
     e.preventDefault();
     if (!username || !password) {
-      showMessage('יש למלא את כל השדות', 'error');
-      setShowLogin(false); // סגירת החלונית במקרה של שגיאה
+      displayMessage('יש למלא את כל השדות', 'error');
+      setShowLogin(false);
       clearForm();
       return;
     }
@@ -26,50 +39,70 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
     if (loggedInUser) {
       localStorage.setItem('current-user', loggedInUser);
       onUserLogin(loggedInUser);
-      showMessage('התחברת בהצלחה', 'success');
+      displayMessage('התחברת בהצלחה', 'success');
       setShowLogin(false);
       clearForm();
     } else {
-      showMessage('שם משתמש או סיסמה שגויים', 'error');
+      displayMessage('שם משתמש או סיסמה שגויים', 'error');
       setShowLogin(false); 
       clearForm();
     }
   };
 
+  // Handle registration form submission
   const handleRegister = (e) => {
     e.preventDefault();
     if (!username || !password) {
-      showMessage('יש למלא את כל השדות', 'error');
+      displayMessage('יש למלא את כל השדות', 'error');
       setShowRegister(false); 
       return;
     }
 
     const success = storageService.registerUser(username, password);
     if (success) {
-      showMessage('הרשמה בוצעה בהצלחה, כעת ניתן להתחבר', 'success');
+      displayMessage('הרשמה בוצעה בהצלחה, כעת ניתן להתחבר', 'success');
       setShowRegister(false);
+      // Open login dialog after successful registration
+      setTimeout(() => {
+        setShowLogin(true);
+      }, 1000);
       clearForm();
     } else {
-      showMessage('שם המשתמש כבר קיים במערכת', 'error');
+      displayMessage('שם המשתמש כבר קיים במערכת', 'error');
       setShowRegister(false); 
       clearForm();
     }
   };
 
+  // Open logout confirmation dialog
+  const confirmLogout = () => {
+    setShowConfirmLogout(true);
+  };
+
+  // Perform logout
   const handleLogout = () => {
     localStorage.removeItem('current-user');
-    onUserLogout();
-    showMessage('התנתקת בהצלחה', 'success');
+    onUserLogout(); // Call external function to handle documents closing
+    displayMessage('התנתקת בהצלחה', 'success');
+    setShowConfirmLogout(false);
   };
 
-  const showMessage = (text, type) => {
-    setMessage(text);
-    setMessageType(type);
-    setTimeout(() => {
-      setMessage('');
-    }, 3000);
+  // Display messages function
+  const displayMessage = (text, type) => {
+    // If showMessage was passed from parent, use it
+    if (typeof showMessage === 'function') {
+      showMessage(text, type);
+    } else {
+      // Otherwise, use internal message system
+      setMessage(text);
+      setMessageType(type);
+      setTimeout(() => {
+        setMessage('');
+      }, 3000);
+    }
   };
 
+  // Clear form fields
   const clearForm = () => {
     setUsername('');
     setPassword('');
@@ -80,7 +113,7 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
       {currentUser ? (
         <div className="user-info">
           <span className="welcome-message">שלום, {currentUser}</span>
-          <button className="auth-button logout-button" onClick={handleLogout}>
+          <button className="auth-button logout-button" onClick={confirmLogout}>
             התנתק
           </button>
         </div>
@@ -88,36 +121,30 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
         <div className="auth-buttons">
           <button 
             className="auth-button" 
-            onClick={() => {
-              setShowLogin(true);
-              setShowRegister(false);
-            }}
+            onClick={openLoginDialog}
           >
             התחבר
           </button>
           <button 
             className="auth-button" 
-            onClick={() => {
-              setShowRegister(true);
-              setShowLogin(false);
-            }}
+            onClick={openRegisterDialog}
           >
             הרשם
           </button>
         </div>
       )}
 
-      {/* הודעת התראה - תוצג בחלק העליון של המסך */}
+      {/* Flash message - appears at top of screen */}
       {message && (
         <div className={`auth-message ${messageType} flash-message`}>
           {message}
         </div>
       )}
 
-      {/* טופס התחברות - מתוקן עם מרכוז */}
+      {/* Login form */}
       {showLogin && (
-        <div className="auth-dialog-overlay" >
-          <div className="auth-dialog" >
+        <div className="auth-dialog-overlay">
+          <div className="auth-dialog">
             <h3>התחברות</h3>
             <form onSubmit={handleLogin}>
               <div className="form-group">
@@ -150,10 +177,10 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
         </div>
       )}
 
-      {/* טופס הרשמה - מתוקן עם מרכוז */}
+      {/* Registration form */}
       {showRegister && (
-        <div className="auth-dialog-overlay" >
-          <div className="auth-dialog" >
+        <div className="auth-dialog-overlay">
+          <div className="auth-dialog">
             <h3>הרשמה</h3>
             <form onSubmit={handleRegister}>
               <div className="form-group">
@@ -182,6 +209,20 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser }) => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Logout confirmation dialog */}
+      {showConfirmLogout && (
+        <div className="auth-dialog-overlay">
+          <div className="auth-dialog">
+            <h3>אישור התנתקות</h3>
+            <p>האם אתה בטוח שברצונך להתנתק? כל המסמכים הפתוחים ייסגרו.</p>
+            <div className="auth-dialog-buttons">
+              <button onClick={handleLogout}>אישור</button>
+              <button onClick={() => setShowConfirmLogout(false)}>ביטול</button>
+            </div>
           </div>
         </div>
       )}

@@ -1,39 +1,81 @@
-// שירות לניהול אחסון מקומי (Local Storage)
+// שירות לניהול אחסון מקומי (Local Storage) - מעודכן לתמיכה באימוג'ים
 
 const STORAGE_PREFIX = 'visual-text-editor-';
 
 const storageService = {
-  // שמירת מסמך
-  saveDocument: (fileName, content, style, userId = 'default') => {
+  // שמירת מסמך - מעודכן לתמיכה באימוג'ים
+  saveDocument: (fileName, documentData, userId = 'default') => {
     const documentKey = `${STORAGE_PREFIX}${userId}-${fileName}`;
-    const documentData = {
-      content,
-      style,
+    
+    // וידוא שיש לנו מבנה נתונים תקין
+    const dataToSave = {
+      textSegments: documentData.textSegments || [],
+      fullContent: documentData.fullContent || '',
+      defaultStyle: documentData.defaultStyle || {},
       lastModified: new Date().toISOString(),
       userId
     };
-    localStorage.setItem(documentKey, JSON.stringify(documentData));
     
-    // עדכון רשימת המסמכים של המשתמש
-    const userDocuments = storageService.getUserDocumentsList(userId);
-    if (!userDocuments.includes(fileName)) {
-      userDocuments.push(fileName);
-      storageService.saveUserDocumentsList(userId, userDocuments);
+    try {
+      // שימוש בקידוד מיוחד לטיפול באימוג'ים
+      localStorage.setItem(documentKey, JSON.stringify(dataToSave));
+      
+      // עדכון רשימת המסמכים של המשתמש
+      const userDocuments = storageService.getUserDocumentsList(userId);
+      if (!userDocuments.includes(fileName)) {
+        userDocuments.push(fileName);
+        storageService.saveUserDocumentsList(userId, userDocuments);
+      }
+      
+      return true;
+    } catch (error) {
+      console.error('Error saving document with emojis:', error);
+      
+      // אם יש שגיאה, ננסה לשמור ללא תווים מיוחדים (כתחליף)
+      try {
+        // ניסיון לשמור ללא אימוג'ים
+        const safeData = JSON.parse(JSON.stringify(dataToSave));
+        localStorage.setItem(documentKey, JSON.stringify(safeData));
+        return true;
+      } catch (e) {
+        console.error('Failed fallback save:', e);
+        return false;
+      }
     }
-    
-    return true;
   },
   
-  // טעינת מסמך
+  // טעינת מסמך - מעודכן לתמיכה באימוג'ים
   loadDocument: (fileName, userId = 'default') => {
     const documentKey = `${STORAGE_PREFIX}${userId}-${fileName}`;
-    const documentData = localStorage.getItem(documentKey);
-    
-    if (!documentData) {
+    try {
+      const documentData = localStorage.getItem(documentKey);
+      
+      if (!documentData) {
+        return null;
+      }
+      
+      const parsedData = JSON.parse(documentData);
+      
+      // בדיקה אם זה מסמך ישן (לפני עדכון לסגנונות מרובים)
+      if (!parsedData.textSegments && parsedData.content) {
+        // המרה למבנה החדש
+        return {
+          textSegments: [{ 
+            text: parsedData.content, 
+            style: parsedData.style || {} 
+          }],
+          fullContent: parsedData.content,
+          defaultStyle: parsedData.style || {},
+          lastModified: parsedData.lastModified,
+          userId: parsedData.userId
+        };
+      }
+      
+      return parsedData;
+    } catch (error) {
+      console.error('Error loading document:', error);
       return null;
     }
-    
-    return JSON.parse(documentData);
   },
   
   // מחיקת מסמך

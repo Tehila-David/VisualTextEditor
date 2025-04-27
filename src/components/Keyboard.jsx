@@ -16,7 +16,7 @@ const Keyboard = ({
   applyStyleFromNow,
   onToggleApplyStyleFromNow
 }) => {
-  // מצב לשמירת הסגנונות והצבע הנבחר
+  // State for current style settings
   const [selectedFont, setSelectedFont] = useState('Arial');
   const [selectedSize, setSelectedSize] = useState('16px');
   const [selectedColor, setSelectedColor] = useState('#000000');
@@ -24,35 +24,34 @@ const Keyboard = ({
   const [italicActive, setItalicActive] = useState(false);
   const [underlineActive, setUnderlineActive] = useState(false);
 
-  // מצב לחלונית פעולות מתקדמות
+  // State for advanced options dialog
   const [showAdvanced, setShowAdvanced] = useState(false);
   const [searchText, setSearchText] = useState('');
   const [replaceText, setReplaceText] = useState('');
 
-  // הגדרת מערכי המקלדת
+  // Keyboard layouts definition
   const hebrewLayout = [
     ['/', 'י', 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ', 'ש', '%'],
     ['ד', 'ג', 'כ', 'ע', 'י', 'ח', 'ל', 'ך', 'ף', 'ז', 'ס', '$'],
     [')', '(', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', '.', '#', '^'],
-    ['1','2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@']
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@']
   ];
 
   const englishLayout = [
     ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'b', 'n',],
-    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l','v', 'm', 'c'],
-    ['z', 'x', ';', '#', '$' , '!', '@' ,',', '.', '/', '%', '^'],
+    ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'v', 'm', 'c'],
+    ['z', 'x', ';', '#', '$', '!', '@', ',', '.', '/', '%', '^'],
     ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '&', '*']
   ];
 
   const emojiLayout = [
-    ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '☺️', '😊', '🙃', '😉'],
+    ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '☺️', '😊', '🙂', '😉'],
     ['😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '❤️', '💕', '💞', '💓'],
     ['💗', '💖', '💘', '💝', '💟', '❣️', '👍', '👌', '👏', '🙌', '🤝', '🙏'],
     ['👐', '🤲', '💪', '✌️', '🎉', '🎊', '🎂', '🎁', '🎄', '🎃', '🎗️', '🎟️']
   ];
 
-
-  // בחירת המקלדת הנכונה לפי השפה
+  // Select current keyboard layout
   let currentLayout;
   switch (language) {
     case 'english':
@@ -65,7 +64,7 @@ const Keyboard = ({
       currentLayout = hebrewLayout;
   }
 
-  // הגדרת אפשרויות גופן, גודל וצבע
+  // Font, size and color options
   const fonts = [
     { value: 'Arial', label: 'Arial' },
     { value: 'Times New Roman', label: 'Times New Roman' },
@@ -95,7 +94,7 @@ const Keyboard = ({
     { value: '#808080', label: 'אפור' }
   ];
 
-  // פונקציות לטיפול בשינויים
+  // Style change handlers
   const handleFontChange = (e) => {
     const font = e.target.value;
     setSelectedFont(font);
@@ -131,7 +130,7 @@ const Keyboard = ({
     onStyleChange({ textDecoration: newState ? 'underline' : 'none' });
   };
 
-  // פונקציות לפעולות מתקדמות
+  // Advanced options handlers
   const handleSearch = () => {
     if (searchText && onSearch) {
       onSearch(searchText);
@@ -144,9 +143,40 @@ const Keyboard = ({
     }
   };
 
+  // Style scope handler
+  const setStyleScope = (value) => {
+    console.log("Changing style scope to:", value);
+    if (onToggleApplyStyleFromNow) {
+      onToggleApplyStyleFromNow(value);
+    }
+  };
+  // Helper function to handle keyboard presses
+  const handleKeyPress = (key) => {
+    // Safety check to ensure the key is defined and valid
+    if (key === undefined || key === null) {
+      console.error("Key is undefined or null");
+      return;
+    }
+
+    // Convert to string in case it's not already
+    const charToAdd = String(key);
+
+    // Ensure emojis are handled correctly
+    if (currentLanguage === 'emoji') {
+      // Use setTimeout to work around asynchronous state update issues
+      
+      onAddCharacter(charToAdd);
+     
+    } else {
+      // For regular characters
+      onAddCharacter(charToAdd);
+    }
+  };
+
+
   return (
     <div className="keyboard-main">
-      {/* סייד-בר ימני - אפשרויות עיצוב */}
+      {/* Right sidebar - Styling options */}
       <div className="right-sidebar">
         <div className="style-section">
           <div className="section-title">גופן</div>
@@ -220,20 +250,29 @@ const Keyboard = ({
           </div>
         </div>
 
-        {/* חדש: כפתור מצב "מכאן והלאה" */}
+        {/* Style scope buttons */}
         <div className="style-section">
           <div className="section-title">תחולת עיצוב</div>
-          <button
-            className={`style-scope-button ${applyStyleFromNow ? 'active' : ''}`}
-            onClick={onToggleApplyStyleFromNow}
-            title={applyStyleFromNow ? "מכאן והלאה פעיל" : "כל הטקסט פעיל"}
-          >
-            {applyStyleFromNow ? "מכאן והלאה" : "כל הטקסט"}
-          </button>
+          <div className="style-scope-buttons">
+            <button
+              className={`style-scope-button ${!applyStyleFromNow ? 'active' : ''}`}
+              onClick={() => setStyleScope(false)}
+              title="העיצוב יחול על כל הטקסט"
+            >
+              כל הטקסט
+            </button>
+            <button
+              className={`style-scope-button ${applyStyleFromNow ? 'active' : ''}`}
+              onClick={() => setStyleScope(true)}
+              title="העיצוב יחול רק על טקסט חדש"
+            >
+              מכאן והלאה
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* אזור המקלדת */}
+      {/* Keyboard area */}
       <div className="keyboard-wrapper">
         <div className="keyboard">
           <div className="section-title">המקלדת שלי</div>
@@ -243,7 +282,7 @@ const Keyboard = ({
                 <button
                   key={`key-${rowIndex}-${keyIndex}`}
                   className="keyboard-key"
-                  onClick={() => onAddCharacter(key)}
+                  onClick={() => handleKeyPress(key)}
                   aria-label={key}
                 >
                   {key}
@@ -261,7 +300,7 @@ const Keyboard = ({
             </button>
             <button
               className="space-key"
-              onClick={() => onAddCharacter(' ')}
+              onClick={() => handleKeyPress(' ')}
               aria-label="רווח"
             >
               רווח
@@ -270,7 +309,7 @@ const Keyboard = ({
         </div>
       </div>
 
-      {/* סייד-בר שמאלי - פעולות ושפה */}
+      {/* Left sidebar - Actions and language */}
       <div className="left-sidebar">
         <div className="action-section">
           <div className="section-title">פעולות</div>
@@ -299,7 +338,7 @@ const Keyboard = ({
             {showAdvanced ? 'הסתר פעולות מתקדמות' : 'פעולות מתקדמות'}
           </button>
 
-          {/* חלונית פעולות מתקדמות - בתוך הסיידבר */}
+          {/* Advanced options popup */}
           {showAdvanced && (
             <div className="advanced-popup">
               <div className="popup-header">
@@ -335,7 +374,6 @@ const Keyboard = ({
             </div>
           )}
         </div>
-
 
         <div className="action-section">
           <div className="section-title">שפה</div>

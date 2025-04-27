@@ -14,7 +14,7 @@ const TextEditor = ({
   onSearch,
   onReplace,
   applyStyleFromNow,
-  onToggleApplyStyleFromNow
+  onSetApplyStyleFromNow
 }) => {
   return (
     <div className="text-editor-container">
@@ -31,7 +31,7 @@ const TextEditor = ({
         onSearch={onSearch}
         onReplace={onReplace}
         applyStyleFromNow={applyStyleFromNow}
-        onToggleApplyStyleFromNow={onToggleApplyStyleFromNow}
+        onToggleApplyStyleFromNow={onSetApplyStyleFromNow}
       />
     </div>
   );
