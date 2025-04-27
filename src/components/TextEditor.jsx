@@ -12,7 +12,9 @@ const TextEditor = ({
   currentLanguage,
   onUndo,
   onSearch,
-  onReplace
+  onReplace,
+  applyStyleFromNow,
+  onToggleApplyStyleFromNow
 }) => {
   return (
     <div className="text-editor-container">
@@ -28,6 +30,8 @@ const TextEditor = ({
         onUndo={onUndo}
         onSearch={onSearch}
         onReplace={onReplace}
+        applyStyleFromNow={applyStyleFromNow}
+        onToggleApplyStyleFromNow={onToggleApplyStyleFromNow}
       />
     </div>
   );

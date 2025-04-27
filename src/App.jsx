@@ -26,6 +26,9 @@ function App() {
     direction: 'rtl', // כברירת מחדל עבור עברית
   });
 
+  // מצב חדש - האם שינויי עיצוב חלים רק מכאן והלאה
+  const [applyStyleFromNow, setApplyStyleFromNow] = useState(false);
+
   // מצב עבור שפת המקלדת הנוכחית
   const [currentLanguage, setCurrentLanguage] = useState('hebrew');
 
@@ -239,13 +242,22 @@ const closeDocument = (index) => {
 
       setCurrentStyle(newStyle);
 
-      const newDocuments = [...documents];
-      newDocuments[activeDocumentIndex] = {
-        ...newDocuments[activeDocumentIndex],
-        style: newStyle
-      };
-      setDocuments(newDocuments);
+      // אם מצב "מכאן והלאה" אינו מופעל, נחיל את השינויים על כל המסמך
+      if (!applyStyleFromNow) {
+        const newDocuments = [...documents];
+        newDocuments[activeDocumentIndex] = {
+          ...newDocuments[activeDocumentIndex],
+          style: newStyle
+        };
+        setDocuments(newDocuments);
+      }
+      // אם מצב "מכאן והלאה" מופעל, לא נעדכן את סגנון המסמך עצמו, רק את currentStyle
     }
+  };
+
+  // פונקציה לטוגל מצב "מכאן והלאה"
+  const toggleApplyStyleFromNow = () => {
+    setApplyStyleFromNow(!applyStyleFromNow);
   };
 
   // פונקציה לשינוי שפת המקלדת
@@ -397,6 +409,8 @@ const closeDocument = (index) => {
           onUndo={undo}
           onSearch={searchText}
           onReplace={replaceText}
+          applyStyleFromNow={applyStyleFromNow}
+          onToggleApplyStyleFromNow={toggleApplyStyleFromNow}
         />
       </div>
     </div>
