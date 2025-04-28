@@ -2,14 +2,14 @@ import React, { useState } from 'react';
 import './FileOperations.css';
 import storageService from '../services/storageService';
 
-const FileOperations = ({ 
-  documents, 
-  activeDocumentIndex, 
-  onLoadDocument, 
-  onCreateNewDocument, 
-  onOpenDocument, 
+const FileOperations = ({
+  documents,
+  activeDocumentIndex,
+  onLoadDocument,
+  onCreateNewDocument,
+  onOpenDocument,
   currentUser = 'default',
-  showMessage 
+  showMessage
 }) => {
   const [documentName, setDocumentName] = useState('');
   const [showSaveDialog, setShowSaveDialog] = useState(false);
@@ -17,17 +17,17 @@ const FileOperations = ({
   const [documentsList, setDocumentsList] = useState([]);
   const [message, setMessage] = useState('');
   const [messageType, setMessageType] = useState(''); // 'success' or 'error'
-  
+
   // Confirmation dialog
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [confirmAction, setConfirmAction] = useState(null);
   const [confirmMessage, setConfirmMessage] = useState('');
-  
+
   // Check if user is logged in
   const isLoggedIn = () => {
     return currentUser && currentUser !== 'default';
   };
-  
+
   // Load user's document list
   const loadDocumentsList = () => {
     const list = storageService.getUserDocumentsList(currentUser);
@@ -35,6 +35,47 @@ const FileOperations = ({
   };
 
   // Save document - updated for multi-style support
+  // const saveDocument = () => {
+  //   // Check if user is logged in
+  //   if (!isLoggedIn()) {
+  //     displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
+  //     setShowSaveDialog(false);
+  //     return;
+  //   }
+
+  //   if (!documentName.trim()) {
+  //     displayMessage('נא להזין שם פתק', 'error');
+  //     return;
+  //   }
+
+  //   if (activeDocumentIndex < 0 || !documents[activeDocumentIndex]) {
+  //     displayMessage('אין פתק פעיל לשמירה', 'error');
+  //     return;
+  //   }
+
+  //   try {
+  //     const currentDoc = documents[activeDocumentIndex];
+
+  //     // Prepare data for saving
+  //     const documentData = {
+  //       textSegments: currentDoc.textSegments || [],
+  //       fullContent: currentDoc.fullContent || '',
+  //       defaultStyle: currentDoc.defaultStyle || {}
+  //     };
+
+  //     storageService.saveDocument(documentName, documentData, currentUser);
+  //     displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
+  //     setShowSaveDialog(false);
+  //     // Reload document list after save
+  //     loadDocumentsList();
+  //   } catch (error) {
+  //     displayMessage('שגיאה בשמירת הפתק', 'error');
+  //     console.error('Error saving document:', error);
+  //   }
+  // };
+
+  // בפונקציית saveDocument בקובץ FileOperations.jsx
+
   const saveDocument = () => {
     // Check if user is logged in
     if (!isLoggedIn()) {
@@ -42,7 +83,7 @@ const FileOperations = ({
       setShowSaveDialog(false);
       return;
     }
-    
+
     if (!documentName.trim()) {
       displayMessage('נא להזין שם פתק', 'error');
       return;
@@ -55,15 +96,30 @@ const FileOperations = ({
 
     try {
       const currentDoc = documents[activeDocumentIndex];
-      
+
       // Prepare data for saving
       const documentData = {
         textSegments: currentDoc.textSegments || [],
         fullContent: currentDoc.fullContent || '',
         defaultStyle: currentDoc.defaultStyle || {}
       };
-      
+
       storageService.saveDocument(documentName, documentData, currentUser);
+
+      // Update the current document name to what was saved
+      const newDocuments = [...documents];
+      newDocuments[activeDocumentIndex] = {
+        ...newDocuments[activeDocumentIndex],
+        name: documentName
+      };
+
+      // Saving the changes
+      onLoadDocument(
+        currentDoc.textSegments,
+        currentDoc.defaultStyle,
+        documentName
+      );
+
       displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
       setShowSaveDialog(false);
       // Reload document list after save
@@ -82,7 +138,7 @@ const FileOperations = ({
       setShowOpenDialog(false);
       return;
     }
-    
+
     try {
       const doc = storageService.loadDocument(fileName, currentUser);
       if (doc) {
@@ -94,7 +150,7 @@ const FileOperations = ({
           // Old format - convert to new format
           onOpenDocument([{ text: doc.content, style: doc.style }], doc.style, fileName);
         }
-        
+
         displayMessage(`הפתק "${fileName}" נטען בהצלחה`, 'success');
         setShowOpenDialog(false);
       } else {
@@ -109,13 +165,13 @@ const FileOperations = ({
   // Open delete confirmation dialog
   const confirmDeleteDocument = (fileName, event) => {
     event.stopPropagation(); // Prevent document loading when clicking delete button
-    
+
     // Check if user is logged in
     if (!isLoggedIn()) {
       displayMessage('עליך להתחבר כדי למחוק פתקים', 'error');
       return;
     }
-    
+
     setConfirmMessage(`האם אתה בטוח שברצונך למחוק את הפתק "${fileName}"?`);
     setConfirmAction(() => () => {
       try {
@@ -138,7 +194,7 @@ const FileOperations = ({
       displayMessage('עליך להתחבר כדי ליצור פתק חדש', 'error');
       return;
     }
-    
+
     onCreateNewDocument(); // Call external function
     displayMessage('נוצר פתק חדש', 'success');
   };
@@ -176,15 +232,15 @@ const FileOperations = ({
   return (
     <div className="file-operations">
       <div className="file-buttons">
-        <button 
-          className="file-button" 
+        <button
+          className="file-button"
           onClick={handleCreateNew}
           title={isLoggedIn() ? "פתק חדש" : "יש להתחבר תחילה"}
         >
           חדש
         </button>
-        <button 
-          className="file-button" 
+        <button
+          className="file-button"
           onClick={() => {
             // Check if user is logged in before opening save dialog
             if (!isLoggedIn()) {
@@ -197,15 +253,15 @@ const FileOperations = ({
         >
           שמור
         </button>
-        <button 
-          className="file-button" 
+        <button
+          className="file-button"
           onClick={() => {
             // Check if user is logged in
             if (!isLoggedIn()) {
               displayMessage('עליך להתחבר כדי לפתוח פתקים', 'error');
               return;
             }
-            
+
             // Load document list when opening dialog
             loadDocumentsList();
             setShowOpenDialog(true);
