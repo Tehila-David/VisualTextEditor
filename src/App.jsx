@@ -161,7 +161,7 @@ function App() {
     if (!documentToClose) return;
 
     // Check if it's a default note (not a saved one)
-    //const isDefaultNoteName = /^פתק \d+$/.test(documentToClose.name);
+    const isDefaultNoteName = /^פתק \d+$/.test(documentToClose.name);
 
     // Add print for debugging
     console.log('Closing document:', documentToClose.name);
@@ -174,6 +174,7 @@ function App() {
     // 3. The name of the note is not a default name
     if (currentUser && currentUser !== 'default' &&
       documentToClose.name &&
+      !isDefaultNoteName &&
       documentToClose.fullContent && documentToClose.fullContent.trim() !== '') {
       try {
         console.log('Attempting to auto-save document:', documentToClose.name);
