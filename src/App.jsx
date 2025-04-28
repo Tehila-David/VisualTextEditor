@@ -146,73 +146,39 @@ function App() {
     setCursorPosition(position);
     console.log('Cursor position changed to:', position);
   };
+// Function to close a document
+const closeDocument = (index) => {
+  // בדיקה שהמסמך קיים
+  const documentToClose = documents[index];
+  if (!documentToClose) return;
 
-  // Function to close a document
-  const closeDocument = (index) => {
-    // A closed document won't open again immediately
-    const documentToClose = documents[index];
+  // יצירת עותק של רשימת המסמכים הנוכחית
+  const newDocuments = [...documents];
+  // הסרת המסמך מהרשימה
+  newDocuments.splice(index, 1);
+  
+  // עדכון רשימת המסמכים
+  setDocuments(newDocuments);
 
-    // Check if a document exists at this location
-    if (!documentToClose) return;
-
-    // Instead of window.confirm, use the application's message system
-    // Save the current state to restore after the user confirms or cancels
-    if (documentToClose.fullContent && documentToClose.fullContent.trim().length > 0) {
-      // Here we'll add custom logic for asking whether to delete
-      // For now, continue with the existing logic
-      const newDocuments = [...documents];
-      newDocuments.splice(index, 1);
-
-      // Update the document list
-      setDocuments(newDocuments);
-
-      // Update the active document
-      if (index === activeDocumentIndex) {
-        if (newDocuments.length > 0) {
-          // If we closed the last document, select the new last document
-          if (index >= newDocuments.length) {
-            setActiveDocumentIndex(newDocuments.length - 1);
-          } else {
-            setActiveDocumentIndex(index < newDocuments.length ? index : newDocuments.length - 1);
-          }
-        } else {
-          // If no documents remain, create a new document
-          setActiveDocumentIndex(-1);
-          createNewDocument();
-        }
-      } else if (index < activeDocumentIndex) {
-        // If the closed document was before the active one, update the index
-        setActiveDocumentIndex(activeDocumentIndex - 1);
+  // עדכון המסמך הפעיל
+  if (index === activeDocumentIndex) {
+    if (newDocuments.length > 0) {
+      // אם סגרנו את המסמך האחרון, נבחר את המסמך האחרון החדש
+      if (index >= newDocuments.length) {
+        setActiveDocumentIndex(newDocuments.length - 1);
+      } else {
+        setActiveDocumentIndex(index < newDocuments.length ? index : newDocuments.length - 1);
       }
     } else {
-      // If the document is empty, close it without confirmation
-      const newDocuments = [...documents];
-      newDocuments.splice(index, 1);
-
-      // Update the document list
-      setDocuments(newDocuments);
-
-      // Update the active document
-      if (index === activeDocumentIndex) {
-        if (newDocuments.length > 0) {
-          // If we closed the last document, select the new last document
-          if (index >= newDocuments.length) {
-            setActiveDocumentIndex(newDocuments.length - 1);
-          } else {
-            setActiveDocumentIndex(index < newDocuments.length ? index : newDocuments.length - 1);
-          }
-        } else {
-          // If no documents remain, create a new document
-          setActiveDocumentIndex(-1);
-          createNewDocument();
-        }
-      } else if (index < activeDocumentIndex) {
-        // If the closed document was before the active one, update the index
-        setActiveDocumentIndex(activeDocumentIndex - 1);
-      }
+      // אם לא נשארו מסמכים פתוחים, נאפס את האינדקס הפעיל
+      setActiveDocumentIndex(-1);
+      // אין צורך ליצור מסמך חדש אוטומטית בעת סגירת המסמך האחרון
     }
-  };
-
+  } else if (index < activeDocumentIndex) {
+    // אם המסמך שנסגר היה לפני המסמך הפעיל, יש לעדכן את האינדקס
+    setActiveDocumentIndex(activeDocumentIndex - 1);
+  }
+};
   
   
 
@@ -1006,9 +972,15 @@ const handleUserLogout = () => {
 };
 
 // Check if we need to create a new document if there are no open documents
-if (documents.length === 0) {
-  createNewDocument();
-}
+//if (documents.length === 0) {
+  //createNewDocument();
+//}
+// יצירת מסמך חדש רק בעת טעינת הדף בפעם הראשונה
+React.useEffect(() => {
+  if (documents.length === 0 && currentUser) {
+    createNewDocument();
+  }
+}, []); // הפונקציה תרוץ רק פעם אחת בטעינה ראשונית
 
 return (
   <div className="app-container">
