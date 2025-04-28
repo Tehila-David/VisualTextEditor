@@ -76,7 +76,75 @@ const FileOperations = ({
 
   // בפונקציית saveDocument בקובץ FileOperations.jsx
 
+  // const saveDocument = () => {
+  //   // Check if user is logged in
+  //   if (!isLoggedIn()) {
+  //     displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
+  //     setShowSaveDialog(false);
+  //     return;
+  //   }
+
+  //   if (!documentName.trim()) {
+  //     displayMessage('נא להזין שם פתק', 'error');
+  //     return;
+  //   }
+
+  //   if (activeDocumentIndex < 0 || !documents[activeDocumentIndex]) {
+  //     displayMessage('אין פתק פעיל לשמירה', 'error');
+  //     return;
+  //   }
+
+  //   try {
+  //     const currentDoc = documents[activeDocumentIndex];
+
+  //     // Prepare data for saving
+  //     const documentData = {
+  //       textSegments: currentDoc.textSegments || [],
+  //       fullContent: currentDoc.fullContent || '',
+  //       defaultStyle: currentDoc.defaultStyle || {}
+  //     };
+
+  //     storageService.saveDocument(documentName, documentData, currentUser);
+
+  //     // Update the current document name to what was saved
+  //     const newDocuments = [...documents];
+  //     newDocuments[activeDocumentIndex] = {
+  //       ...newDocuments[activeDocumentIndex],
+  //       name: documentName
+  //     };
+
+  //     // Saving the changes
+  //     onLoadDocument(
+  //       currentDoc.textSegments,
+  //       currentDoc.defaultStyle,
+  //       documentName
+  //     );
+
+  //     displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
+  //     setShowSaveDialog(false);
+  //     // Reload document list after save
+  //     loadDocumentsList();
+  //   } catch (error) {
+  //     displayMessage('שגיאה בשמירת הפתק', 'error');
+  //     console.error('Error saving document:', error);
+  //   }
+  // };
+  // Save document - updated for multi-style support
+  // Save document - updated for multi-style support
+  // Save document - updated with custom confirm dialog
   const saveDocument = () => {
+    // Check if the note is already saved with that name
+    const existingDocuments = storageService.getUserDocumentsList(currentUser);
+    const documentExists = existingDocuments.includes(documentName);
+
+    if (documentExists) {
+
+      // New behavior: do not allow overwrite, show error message
+      displayMessage(`פתק בשם "${documentName}" כבר שמור במערכת`, 'error');
+      setShowSaveDialog(false);
+      return;
+    }
+
     // Check if user is logged in
     if (!isLoggedIn()) {
       displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
@@ -94,42 +162,83 @@ const FileOperations = ({
       return;
     }
 
-    try {
-      const currentDoc = documents[activeDocumentIndex];
 
-      // Prepare data for saving
-      const documentData = {
-        textSegments: currentDoc.textSegments || [],
-        fullContent: currentDoc.fullContent || '',
-        defaultStyle: currentDoc.defaultStyle || {}
-      };
 
-      storageService.saveDocument(documentName, documentData, currentUser);
 
-      // Update the current document name to what was saved
-      const newDocuments = [...documents];
-      newDocuments[activeDocumentIndex] = {
-        ...newDocuments[activeDocumentIndex],
-        name: documentName
-      };
+    // If the note does not exist, save it directly
+    savingProcess();
 
-      // Saving the changes
-      onLoadDocument(
-        currentDoc.textSegments,
-        currentDoc.defaultStyle,
-        documentName
-      );
+    // Inner function to handle saving
+    function savingProcess() {
+      try {
+        const currentDoc = documents[activeDocumentIndex];
 
-      displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
-      setShowSaveDialog(false);
-      // Reload document list after save
-      loadDocumentsList();
-    } catch (error) {
-      displayMessage('שגיאה בשמירת הפתק', 'error');
-      console.error('Error saving document:', error);
+        // Prepare data for saving
+        const documentData = {
+          textSegments: currentDoc.textSegments || [],
+          fullContent: currentDoc.fullContent || '',
+          defaultStyle: currentDoc.defaultStyle || {}
+        };
+
+        storageService.saveDocument(documentName, documentData, currentUser);
+
+        // Update the document's name
+        const newDocuments = [...documents];
+        newDocuments[activeDocumentIndex] = {
+          ...newDocuments[activeDocumentIndex],
+          name: documentName
+        };
+
+        // Save the changes and reload the document
+        onLoadDocument(
+          currentDoc.textSegments,
+          currentDoc.defaultStyle,
+          documentName
+        );
+
+        displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
+        setShowSaveDialog(false);
+        // Reload document list after save
+        loadDocumentsList();
+      } catch (error) {
+        displayMessage('שגיאה בשמירת הפתק', 'error');
+        console.error('Error saving document:', error);
+      }
     }
   };
 
+  // Load document - updated for multi-style support
+  // const openDocument = (fileName) => {
+  //   // Check if user is logged in
+  //   if (!isLoggedIn()) {
+  //     displayMessage('עליך להתחבר כדי לפתוח פתקים', 'error');
+  //     setShowOpenDialog(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     const doc = storageService.loadDocument(fileName, currentUser);
+  //     if (doc) {
+  //       // Check if file is in new or old format
+  //       if (doc.textSegments) {
+  //         // New format with multi-style segments
+  //         onOpenDocument(doc.textSegments, doc.defaultStyle, fileName);
+  //       } else {
+  //         // Old format - convert to new format
+  //         onOpenDocument([{ text: doc.content, style: doc.style }], doc.style, fileName);
+  //       }
+
+  //       displayMessage(`הפתק "${fileName}" נטען בהצלחה`, 'success');
+  //       setShowOpenDialog(false);
+  //     } else {
+  //       displayMessage(`לא ניתן לטעון את הפתק "${fileName}"`, 'error');
+  //     }
+  //   } catch (error) {
+  //     displayMessage('שגיאה בטעינת הפתק', 'error');
+  //     console.error('Error loading document:', error);
+  //   }
+  // };
+  // Load document - updated for multi-style support
   // Load document - updated for multi-style support
   const openDocument = (fileName) => {
     // Check if user is logged in
@@ -139,9 +248,21 @@ const FileOperations = ({
       return;
     }
 
+    // Check if the file is already open
+    const isAlreadyOpen = documents.some(doc => doc.name === fileName);
+    if (isAlreadyOpen) {
+      // Close the dialog before performing the other actions
+      setShowOpenDialog(false);
+      displayMessage(`הפתק "${fileName}" כבר פתוח`, 'success');
+      return;
+    }
+
     try {
       const doc = storageService.loadDocument(fileName, currentUser);
       if (doc) {
+        // Close the dialog before loading the document
+        setShowOpenDialog(false);
+
         // Check if file is in new or old format
         if (doc.textSegments) {
           // New format with multi-style segments
@@ -152,7 +273,6 @@ const FileOperations = ({
         }
 
         displayMessage(`הפתק "${fileName}" נטען בהצלחה`, 'success');
-        setShowOpenDialog(false);
       } else {
         displayMessage(`לא ניתן לטעון את הפתק "${fileName}"`, 'error');
       }
@@ -242,17 +362,31 @@ const FileOperations = ({
         <button
           className="file-button"
           onClick={() => {
-            // Check if user is logged in before opening save dialog
             if (!isLoggedIn()) {
               displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
               return;
             }
+            if (activeDocumentIndex < 0 || !documents[activeDocumentIndex]) {
+              displayMessage('אין פתק פעיל לשמירה', 'error');
+              return;
+            }
+
+            const currentDocName = documents[activeDocumentIndex].name || '';
+            const existingDocuments = storageService.getUserDocumentsList(currentUser);
+
+            if (existingDocuments.includes(currentDocName)) {
+              displayMessage(`פתק בשם "${currentDocName}" כבר שמור במערכת`, 'error');
+              return;
+            }
+
+            setDocumentName(currentDocName); // אפשרות להכניס את השם כבר
             setShowSaveDialog(true);
           }}
           title={isLoggedIn() ? "שמירת פתק" : "יש להתחבר תחילה"}
         >
           שמור
         </button>
+
         <button
           className="file-button"
           onClick={() => {

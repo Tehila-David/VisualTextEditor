@@ -89,32 +89,32 @@ const MultiTextDisplay = ({
   };
 
   // Handler for mouse clicks to update cursor position
-  const handleDocumentClick = (event, index) => {
-    if (index === activeDocumentIndex && onCursorChange) {
-      const element = event.currentTarget.querySelector('.document-content');
-      if (!element) return;
+  // const handleDocumentClick = (event, index) => {
+  //   if (index === activeDocumentIndex && onCursorChange) {
+  //     const element = event.currentTarget.querySelector('.document-content');
+  //     if (!element) return;
       
-      const doc = documents[index];
-      if (!doc.textSegments || doc.textSegments.length === 0) {
-        onCursorChange(0);
-        return;
-      }
+  //     const doc = documents[index];
+  //     if (!doc.textSegments || doc.textSegments.length === 0) {
+  //       onCursorChange(0);
+  //       return;
+  //     }
       
-      // Simple calculation - get relative percentage of click position
-      // and convert to relative position in text
-      const rect = element.getBoundingClientRect();
-      const relativeX = event.clientX - rect.left;
-      const percentage = relativeX / rect.width;
+  //     // Simple calculation - get relative percentage of click position
+  //     // and convert to relative position in text
+  //     const rect = element.getBoundingClientRect();
+  //     const relativeX = event.clientX - rect.left;
+  //     const percentage = relativeX / rect.width;
       
-      const totalLength = doc.fullContent.length;
-      let estimatedPosition = Math.floor(percentage * totalLength);
+  //     const totalLength = doc.fullContent.length;
+  //     let estimatedPosition = Math.floor(percentage * totalLength);
       
-      // Ensure position is within bounds
-      estimatedPosition = Math.min(Math.max(0, estimatedPosition), totalLength);
+  //     // Ensure position is within bounds
+  //     estimatedPosition = Math.min(Math.max(0, estimatedPosition), totalLength);
       
-      onCursorChange(estimatedPosition);
-    }
-  };
+  //     onCursorChange(estimatedPosition);
+  //   }
+  // };
 
   return (
     <div className="multi-text-display">

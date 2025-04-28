@@ -5,6 +5,8 @@ import MultiTextDisplay from './components/MultiTextDisplay';
 import TextEditor from './components/TextEditor';
 import FileOperations from './components/FileOperations';
 import UserAuth from './components/UserAuth';
+import storageService from './services/storageService';
+
 
 function App() {
 
@@ -109,7 +111,7 @@ function App() {
   // Function to open a new document
   const openNewDocument = (textSegments, defaultStyle, name) => {
     const doc = {
-      name: name || `מסמך ${documents.length + 1}`,
+      name: name || `פתק${documents.length + 1}`,
       textSegments: textSegments || [],
       fullContent: textSegments ? textSegments.reduce((acc, segment) => acc + segment.text, '') : '',
       defaultStyle: { ...defaultStyle }
@@ -146,36 +148,66 @@ function App() {
     setCursorPosition(position);
     console.log('Cursor position changed to:', position);
   };
-  // Function to close a document
+
+
+  // Function to close a document - with autosave
   const closeDocument = (index) => {
-    // בדיקה שהמסמך קיים
+    // Check that the document exists
     const documentToClose = documents[index];
     if (!documentToClose) return;
 
-    // יצירת עותק של רשימת המסמכים הנוכחית
+    // Check if it's a default note (not a saved one)
+    const isDefaultNoteName = /^פתק \d+$/.test(documentToClose.name);
+
+    // Add print for debugging
+    console.log('Closing document:', documentToClose.name);
+    console.log('Is default note name:', isDefaultNoteName);
+    console.log('Has content:', documentToClose.fullContent && documentToClose.fullContent.trim() !== '');
+
+    // Auto-save only if:
+    // 1. The user is connected
+    // 2. The note has content
+    // 3. The name of the note is not a default name
+    if (currentUser && currentUser !== 'default' &&
+      documentToClose.name &&
+      !isDefaultNoteName &&
+      documentToClose.fullContent && documentToClose.fullContent.trim() !== '') {
+      try {
+        console.log('Attempting to auto-save document:', documentToClose.name);
+
+        // Save directly with storageService instead of loadDocument
+        const documentData = {
+          textSegments: documentToClose.textSegments || [],
+          fullContent: documentToClose.fullContent || '',
+          defaultStyle: documentToClose.defaultStyle || {}
+        };
+
+        storageService.saveDocument(documentToClose.name, documentData, currentUser);
+
+        showMessage(`הפתק "${documentToClose.name}" נשמר אוטומטית לפני הסגירה`, 'success');
+      } catch (error) {
+        console.error('שגיאה בשמירה אוטומטית:', error);
+        showMessage('שגיאה בשמירה אוטומטית של הפתק', 'error');
+      }
+    }
+
+    // Continue regular document closing code...
     const newDocuments = [...documents];
-    // הסרת המסמך מהרשימה
     newDocuments.splice(index, 1);
 
-    // עדכון רשימת המסמכים
     setDocuments(newDocuments);
 
-    // עדכון המסמך הפעיל
     if (index === activeDocumentIndex) {
       if (newDocuments.length > 0) {
-        // אם סגרנו את המסמך האחרון, נבחר את המסמך האחרון החדש
         if (index >= newDocuments.length) {
           setActiveDocumentIndex(newDocuments.length - 1);
         } else {
           setActiveDocumentIndex(index < newDocuments.length ? index : newDocuments.length - 1);
         }
       } else {
-        // אם לא נשארו מסמכים פתוחים, נאפס את האינדקס הפעיל
         setActiveDocumentIndex(-1);
-        // אין צורך ליצור מסמך חדש אוטומטית בעת סגירת המסמך האחרון
       }
     } else if (index < activeDocumentIndex) {
-      // אם המסמך שנסגר היה לפני המסמך הפעיל, יש לעדכן את האינדקס
       setActiveDocumentIndex(activeDocumentIndex - 1);
     }
   };
@@ -336,155 +368,9 @@ function App() {
     }
   };
 
-  // const addCharacter = (char) => {
-  //   if (activeDocumentIndex >= 0) {
-  //     // אם התו הוא אימוגי, פשוט מוסיפים אותו
-  //     const charToAdd = String(char);
-  //     const isEmoji = emojiRegex().test(charToAdd); 
-  //     const newDocuments = [...documents];
-  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Copy document
-
-  //     // אם אין מקטעים, יוצרים מקטע חדש עם התו
-  //     if (!currentDoc.textSegments) {
-  //       currentDoc.textSegments = [];
-  //     }
-
-  //     if (currentDoc.textSegments.length === 0 || isEmoji) {
-  //       // אם אין מקטעים או אם מדובר באימוגי
-  //       currentDoc.textSegments.push({
-  //         text: charToAdd,
-  //         style: { ...currentStyle }
-  //       });
-  //       currentDoc.fullContent = charToAdd;
-
-  //       newDocuments[activeDocumentIndex] = currentDoc;
-  //       setDocuments(newDocuments);
-
-  //       // אם מדובר באימוגי, הסמן יתעדכן לאחר האימוגי
-  //       setCursorPosition(cursorPosition + charToAdd.length);
-  //       return;
-  //     }
-
-  //     // אם יש מקטעים, בודקים איפה להוסיף את התו
-  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
-
-  //     // אם יש סגנון מיוחד שמופעל על המקטעים
-  //     if (applyStyleFromNow) {
-  //       if (segmentIndex >= 0) {
-  //         const currentSegment = currentDoc.textSegments[segmentIndex];
-  //         currentSegment.text = currentSegment.text.substring(0, localPosition) + charToAdd + currentSegment.text.substring(localPosition);
-  //       }
-  //     } else {
-  //       // אם אין סגנון, פשוט משנים את התוכן של המקטע
-  //       currentDoc.textSegments[0].text = currentDoc.textSegments[0].text.substring(0, localPosition) + charToAdd + currentDoc.textSegments[0].text.substring(localPosition);
-  //     }
-
-  //     // מעדכנים את התוכן הכולל של המסמך
-  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
-
-  //     newDocuments[activeDocumentIndex] = currentDoc;
-  //     setDocuments(newDocuments);
-
-  //     // אם מדובר באימוגי, הסמן יתעדכן בהתאם לאורך האימוגי
-  //     if (isEmoji) {
-  //       setCursorPosition(cursorPosition + charToAdd.length);
-  //     } else {
-  //       setCursorPosition(cursorPosition + 1);  // אם זה תו רגיל, העבר רק בחצי
-  //     }
-  //   } else if (documents.length === 0) {
-  //     if (currentUser && currentUser !== 'default') {
-  //       createNewDocument();
-  //       setTimeout(() => addCharacter(char), 10);
-  //     } else {
-  //       showMessage('You must be logged in to create a new note.', 'error');
-  //     }
-  //   }
-  // };
-
 
 
   // Function to delete a character
-  // const deleteCharacter = () => {
-  //   if (activeDocumentIndex >= 0) {
-  //     const newDocuments = [...documents];
-  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
-
-  //     if (!currentDoc.textSegments || currentDoc.textSegments.length === 0 || !currentDoc.fullContent || cursorPosition === 0) {
-  //       return; // Nothing to delete
-  //     }
-
-  //     // Find the segment and relative position
-  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
-
-  //     if (localPosition > 0) {
-  //       // Delete a character within an existing segment
-  //       const segment = currentDoc.textSegments[segmentIndex];
-  //       const beforeDelete = segment.text.substring(0, localPosition - 1);
-  //       const afterDelete = segment.text.substring(localPosition);
-
-  //       if (beforeDelete.length === 0 && afterDelete.length === 0) {
-  //         // The segment became empty - delete it
-  //         currentDoc.textSegments.splice(segmentIndex, 1);
-  //       } else {
-  //         // Update the existing segment
-  //         segment.text = beforeDelete + afterDelete;
-  //       }
-  //     } else if (segmentIndex > 0) {
-  //       // Delete a character at the boundary between segments - delete the last character in the previous segment
-  //       const prevSegment = currentDoc.textSegments[segmentIndex - 1];
-
-  //       if (prevSegment.text.length === 1) {
-  //         // If only one character remains in the previous segment, delete the entire segment
-  //         currentDoc.textSegments.splice(segmentIndex - 1, 1);
-  //       } else {
-  //         // Otherwise, delete just the last character
-  //         prevSegment.text = prevSegment.text.substring(0, prevSegment.text.length - 1);
-  //       }
-  //     }
-
-  //     // Remove empty segments
-  //     currentDoc.textSegments = currentDoc.textSegments.filter(segment => segment.text.length > 0);
-
-  //     // Merge adjacent segments with the same style in "All text" mode
-  //     if (!applyStyleFromNow) {
-  //       // In "All text" mode, merge all segments into one
-  //       if (currentDoc.textSegments.length > 0) {
-  //         const fullText = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
-  //         currentDoc.textSegments = [{
-  //           text: fullText,
-  //           style: { ...currentStyle }
-  //         }];
-  //       }
-  //     } else {
-  //       // In "From now on" mode, check if there are adjacent segments with the same style to merge
-  //       for (let i = 0; i < currentDoc.textSegments.length - 1; i++) {
-  //         const current = currentDoc.textSegments[i];
-  //         const next = currentDoc.textSegments[i + 1];
-
-  //         if (JSON.stringify(current.style) === JSON.stringify(next.style)) {
-  //           // If two adjacent segments have the same style, merge them
-  //           current.text += next.text;
-  //           currentDoc.textSegments.splice(i + 1, 1);
-  //           i--; // Check the same segment again
-  //         }
-  //       }
-  //     }
-
-  //     // Update the full content
-  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
-
-  //     newDocuments[activeDocumentIndex] = currentDoc;
-  //     setDocuments(newDocuments);
-  //     setCursorPosition(cursorPosition - 1);
-
-  //     // Save in history
-  //     const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
-  //     newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
-  //     setHistory(newHistory);
-  //     setHistoryIndex(newHistory.length - 1);
-  //   }
-  // };
-
   const deleteCharacter = () => {
     if (activeDocumentIndex >= 0) {
       const newDocuments = [...documents];
@@ -973,11 +859,29 @@ function App() {
   //   createNewDocument();
   // };
   const handleUserLogout = () => {
+    if (currentUser && currentUser !== 'default') {
+      documents.forEach((doc) => {
+        if (doc && doc.name && doc.fullContent && doc.fullContent.trim() !== '') {
+          const documentData = {
+            textSegments: doc.textSegments || [],
+            fullContent: doc.fullContent || '',
+            defaultStyle: doc.defaultStyle || {}
+          };
+          try {
+            storageService.saveDocument(doc.name, documentData, currentUser);
+          } catch (error) {
+            console.error(`שגיאה בשמירת הפתק "${doc.name}" לפני התנתקות:`, error);
+          }
+        }
+      });
+    }
+
     setCurrentUser(null);
     setDocuments([]);
     setActiveDocumentIndex(-1);
     // The document list is already empty, no need to create a new document here
-    };
+  };
+
 
   // Check if we need to create a new document if there are no open documents
   //if (documents.length === 0) {
