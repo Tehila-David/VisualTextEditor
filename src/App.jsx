@@ -46,6 +46,10 @@ function App() {
   const [appMessage, setAppMessage] = useState('');
   const [appMessageType, setAppMessageType] = useState('');
 
+  const [showConfirmClearText, setShowConfirmClearText] = useState(false);
+  const [pendingClearTextAction, setPendingClearTextAction] = useState(null);
+
+
 
   // Helper function to find text segment and relative position
   const findSegmentAndPosition = (doc, position) => {
@@ -562,9 +566,31 @@ function App() {
   };
 
   // Function to clear text
+  // const clearText = () => {
+  //   if (activeDocumentIndex >= 0) {
+  //     if (window.confirm('Are you sure you want to delete all text?')) {
+  //       const newDocuments = [...documents];
+  //       const currentDoc = { ...newDocuments[activeDocumentIndex] };
+
+  //       // Clear all segments
+  //       currentDoc.textSegments = [];
+  //       currentDoc.fullContent = '';
+
+  //       newDocuments[activeDocumentIndex] = currentDoc;
+  //       setDocuments(newDocuments);
+  //       setCursorPosition(0);
+
+  //       // Save in history
+  //       const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
+  //       newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+  //       setHistory(newHistory);
+  //       setHistoryIndex(newHistory.length - 1);
+  //     }
+  //   }
+  // };
   const clearText = () => {
     if (activeDocumentIndex >= 0) {
-      if (window.confirm('Are you sure you want to delete all text?')) {
+      setPendingClearTextAction(() => () => {
         const newDocuments = [...documents];
         const currentDoc = { ...newDocuments[activeDocumentIndex] };
 
@@ -581,9 +607,13 @@ function App() {
         newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
         setHistory(newHistory);
         setHistoryIndex(newHistory.length - 1);
-      }
+
+        setShowConfirmClearText(false); // Close the dialog after clearing
+      });
+      setShowConfirmClearText(true);
     }
   };
+
 
   // Function to set "From now on" mode
   const setApplyStyleFromNowMode = (value) => {
@@ -692,84 +722,166 @@ function App() {
   };
 
   // Function to search text
+  // const searchText = (searchTerm) => {
+  //   if (activeDocumentIndex >= 0 && searchTerm) {
+  //     const currentDoc = documents[activeDocumentIndex];
+  //     const position = currentDoc.fullContent.indexOf(searchTerm);
+
+  //     if (position !== -1) {
+  //       alert(`The text "${searchTerm}" was found at position ${position}`);
+  //       setCursorPosition(position + searchTerm.length);
+  //       return position;
+  //     } else {
+  //       alert(`The text "${searchTerm}" was not found in the document`);
+  //       return -1;
+  //     }
+  //   }
+  //   return -1;
+  // };
   const searchText = (searchTerm) => {
     if (activeDocumentIndex >= 0 && searchTerm) {
       const currentDoc = documents[activeDocumentIndex];
       const position = currentDoc.fullContent.indexOf(searchTerm);
 
       if (position !== -1) {
-        alert(`The text "${searchTerm}" was found at position ${position}`);
+        showMessage(`הטקסט "${searchTerm}" נמצא במיקום ${position}`, 'success');
         setCursorPosition(position + searchTerm.length);
         return position;
       } else {
-        alert(`The text "${searchTerm}" was not found in the document`);
+        showMessage(`הטקסט "${searchTerm}" לא נמצא במסמך`, 'error');
         return -1;
       }
     }
     return -1;
   };
 
+
   // Function to replace text
-  const replaceText = (searchTerm, replaceTerm) => {
-    if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
-      const newDocuments = [...documents];
-      const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+  // const replaceText = (searchTerm, replaceTerm) => {
+  //   if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
+  //     const newDocuments = [...documents];
+  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
 
-      let replacementCount = 0;
+  //     let replacementCount = 0;
 
-      // Check if replacement is needed
-      if (currentDoc.fullContent.includes(searchTerm)) {
-        if (!applyStyleFromNow) {
-          // In "All text" mode - simple replacement
-          currentDoc.fullContent = currentDoc.fullContent.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+  //     // Check if replacement is needed
+  //     if (currentDoc.fullContent.includes(searchTerm)) {
+  //       if (!applyStyleFromNow) {
+  //         // In "All text" mode - simple replacement
+  //         currentDoc.fullContent = currentDoc.fullContent.replace(new RegExp(searchTerm, 'g'), replaceTerm);
 
-          // Update the content in the single segment
-          if (currentDoc.textSegments.length === 1) {
-            currentDoc.textSegments[0].text = currentDoc.fullContent;
-          } else if (currentDoc.textSegments.length > 1) {
-            // Merge all segments into one
-            currentDoc.textSegments = [{
-              text: currentDoc.fullContent,
-              style: { ...currentStyle }
-            }];
-          }
+  //         // Update the content in the single segment
+  //         if (currentDoc.textSegments.length === 1) {
+  //           currentDoc.textSegments[0].text = currentDoc.fullContent;
+  //         } else if (currentDoc.textSegments.length > 1) {
+  //           // Merge all segments into one
+  //           currentDoc.textSegments = [{
+  //             text: currentDoc.fullContent,
+  //             style: { ...currentStyle }
+  //           }];
+  //         }
 
-          replacementCount = (currentDoc.fullContent.match(new RegExp(replaceTerm, 'g')) || []).length;
-        } else {
-          // In "From now on" mode - replacement while preserving segment structure
-          // Go through all segments and perform replacement
-          for (let i = 0; i < currentDoc.textSegments.length; i++) {
-            const segment = currentDoc.textSegments[i];
+  //         replacementCount = (currentDoc.fullContent.match(new RegExp(replaceTerm, 'g')) || []).length;
+  //       } else {
+  //         // In "From now on" mode - replacement while preserving segment structure
+  //         // Go through all segments and perform replacement
+  //         for (let i = 0; i < currentDoc.textSegments.length; i++) {
+  //           const segment = currentDoc.textSegments[i];
 
-            if (segment.text.includes(searchTerm)) {
-              // Count how many times the search term appears in the segment
-              const count = (segment.text.match(new RegExp(searchTerm, 'g')) || []).length;
-              replacementCount += count;
+  //           if (segment.text.includes(searchTerm)) {
+  //             // Count how many times the search term appears in the segment
+  //             const count = (segment.text.match(new RegExp(searchTerm, 'g')) || []).length;
+  //             replacementCount += count;
 
-              // Replace all occurrences in the segment
-              segment.text = segment.text.replace(new RegExp(searchTerm, 'g'), replaceTerm);
-            }
-          }
+  //             // Replace all occurrences in the segment
+  //             segment.text = segment.text.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+  //           }
+  //         }
 
-          // Update the full content
-          currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+  //         // Update the full content
+  //         currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+  //       }
+
+  //       newDocuments[activeDocumentIndex] = currentDoc;
+  //       setDocuments(newDocuments);
+
+  //       // Save in history
+  //       const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
+  //       newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+  //       setHistory(newHistory);
+  //       setHistoryIndex(newHistory.length - 1);
+
+  //       alert(`Replaced ${replacementCount} occurrences of "${searchTerm}" with "${replaceTerm}"`);
+  //     } else {
+  //       alert(`The text "${searchTerm}" was not found in the document`);
+  //     }
+  //   }
+  // };
+
+  // Function to replace text
+const replaceText = (searchTerm, replaceTerm) => {
+  if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
+    const newDocuments = [...documents];
+    const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+
+    let replacementCount = 0;
+
+    // Check if replacement is needed
+    if (currentDoc.fullContent.includes(searchTerm)) {
+      if (!applyStyleFromNow) {
+        // In "All text" mode - simple replacement
+        currentDoc.fullContent = currentDoc.fullContent.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+
+        // Update the content in the single segment
+        if (currentDoc.textSegments.length === 1) {
+          currentDoc.textSegments[0].text = currentDoc.fullContent;
+        } else if (currentDoc.textSegments.length > 1) {
+          // Merge all segments into one
+          currentDoc.textSegments = [{
+            text: currentDoc.fullContent,
+            style: { ...currentStyle }
+          }];
         }
 
-        newDocuments[activeDocumentIndex] = currentDoc;
-        setDocuments(newDocuments);
-
-        // Save in history
-        const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
-        newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
-        setHistory(newHistory);
-        setHistoryIndex(newHistory.length - 1);
-
-        alert(`Replaced ${replacementCount} occurrences of "${searchTerm}" with "${replaceTerm}"`);
+        replacementCount = (currentDoc.fullContent.match(new RegExp(replaceTerm, 'g')) || []).length;
       } else {
-        alert(`The text "${searchTerm}" was not found in the document`);
+        // In "From now on" mode - replacement while preserving segment structure
+        // Go through all segments and perform replacement
+        for (let i = 0; i < currentDoc.textSegments.length; i++) {
+          const segment = currentDoc.textSegments[i];
+
+          if (segment.text.includes(searchTerm)) {
+            // Count how many times the search term appears in the segment
+            const count = (segment.text.match(new RegExp(searchTerm, 'g')) || []).length;
+            replacementCount += count;
+
+            // Replace all occurrences in the segment
+            segment.text = segment.text.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+          }
+        }
+
+        // Update the full content
+        currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
       }
+
+      newDocuments[activeDocumentIndex] = currentDoc;
+      setDocuments(newDocuments);
+
+      // Save in history
+      const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
+      newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+
+      // Show success message
+      showMessage(`הוחלפו ${replacementCount} מופעים של "${searchTerm}" ב"${replaceTerm}"`, "success");
+    } else {
+      // Show error message
+      showMessage(`לא נמצאו המילים "${searchTerm}" במסמך`, "error");
     }
-  };
+  }
+};
+
 
   // Function to perform undo
   const undo = () => {
@@ -902,6 +1014,25 @@ function App() {
           {appMessage}
         </div>
       )}
+      {showConfirmClearText && (
+        <div className="auth-dialog-overlay">
+          <div className="auth-dialog">
+            <h3>אישור מחיקת טקסט</h3>
+            <p>האם אתה בטוח שברצונך למחוק את כל הטקסט?</p>
+            <div className="auth-dialog-buttons">
+              <button onClick={() => {
+                if (pendingClearTextAction) pendingClearTextAction();
+              }}>
+                אישור
+              </button>
+              <button onClick={() => setShowConfirmClearText(false)}>
+                ביטול
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <UserAuth
         onUserLogin={handleUserLogin}
         onUserLogout={handleUserLogout}
