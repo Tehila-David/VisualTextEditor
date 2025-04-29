@@ -1265,19 +1265,58 @@ function App() {
   const searchText = (searchTerm) => {
     if (activeDocumentIndex >= 0 && searchTerm) {
       const currentDoc = documents[activeDocumentIndex];
-      const position = currentDoc.fullContent.indexOf(searchTerm);
-
-      if (position !== -1) {
-        showMessage(`הטקסט "${searchTerm}" נמצא במיקום ${position}`, 'success');
-        setCursorPosition(position + searchTerm.length);
-        return position;
+      
+      // מציאת כל המופעים של מילת החיפוש
+      const positions = [];
+      let position = -1;
+      let currentPosition = 0;
+      
+      // לולאה שמוצאת את כל המופעים
+      while (true) {
+        position = currentDoc.fullContent.indexOf(searchTerm, currentPosition);
+        
+        if (position === -1) {
+          // לא נמצאו עוד מופעים
+          break;
+        }
+        
+        // נמצא מופע - הוספתו לרשימה והתקדמות לחיפוש הבא
+        positions.push(position);
+        currentPosition = position + searchTerm.length;
+      }
+      
+      if (positions.length > 0) {
+        // נמצאו מופעים - יצירת הודעה עם כל המיקומים
+        const positionsText = positions.join(', ');
+        showMessage(`הטקסט "${searchTerm}" נמצא ב-${positions.length} מקומות. מיקומים: ${positionsText}`, 'success');
+        
+        // אופציונלי: קביעת הסמן למיקום הראשון שנמצא
+        // setCursorPosition(positions[0] + searchTerm.length);
+        
+        return positions;
       } else {
         showMessage(`הטקסט "${searchTerm}" לא נמצא במסמך`, 'error');
-        return -1;
+        return [];
       }
     }
-    return -1;
+    return [];
   };
+  // const searchText = (searchTerm) => {
+  //   if (activeDocumentIndex >= 0 && searchTerm) {
+  //     const currentDoc = documents[activeDocumentIndex];
+  //     const position = currentDoc.fullContent.indexOf(searchTerm);
+
+  //     if (position !== -1) {
+  //       showMessage(`הטקסט "${searchTerm}" נמצא במיקום ${position}`, 'success');
+  //       //setCursorPosition(position + searchTerm.length);
+  //       return position;
+  //     } else {
+  //       showMessage(`הטקסט "${searchTerm}" לא נמצא במסמך`, 'error');
+  //       return -1;
+  //     }
+  //   }
+  //   return -1;
+  // };
 
 
   // Function to replace text
