@@ -185,7 +185,7 @@ const Keyboard = ({
   // סגנון לאייקוני כפתורים
   const buttonIconStyle = {
     marginLeft: '7px',
-    fontSize: '14px' // אייקונים גדולים יותר בכפתורים
+    fontSize: '13px' // אייקונים גדולים יותר בכפתורים
   };
 
   return (
@@ -194,7 +194,7 @@ const Keyboard = ({
       <div className="right-sidebar">
         <div className="style-section">
           <div className="section-title">
-            <i className="fas fa-font" style={{...iconStyle, fontSize: '10px'}}></i>
+            <i className="fas fa-font" style={{ ...iconStyle, fontSize: '10px' }}></i>
             גופן
           </div>
           <div className="control-row">
@@ -212,7 +212,7 @@ const Keyboard = ({
 
         <div className="style-section">
           <div className="section-title">
-            <i className="fas fa-text-height" style={{...iconStyle, fontSize: '10px'}}></i>
+            <i className="fas fa-text-height" style={{ ...iconStyle, fontSize: '10px' }}></i>
             גודל
           </div>
           <div className="control-row">
@@ -230,7 +230,7 @@ const Keyboard = ({
 
         <div className="style-section">
           <div className="section-title">
-            <i className="fas fa-palette" style={{...iconStyle, fontSize: '10px', color: selectedColor}}></i>
+            <i className="fas fa-palette" style={{ ...iconStyle, fontSize: '10px', color: selectedColor }}></i>
             צבע
           </div>
           <div className="control-row">
@@ -297,7 +297,7 @@ const Keyboard = ({
       <div className="keyboard-wrapper">
         <div className="keyboard">
           <div className="section-title">
-            <i className="fas fa-keyboard" style={{...iconStyle, fontSize: '14px'}}></i>
+            <i className="fas fa-keyboard" style={{ ...iconStyle, fontSize: '14px' }}></i>
             המקלדת שלי
           </div>
           {currentLayout.map((row, rowIndex) => (
@@ -320,7 +320,7 @@ const Keyboard = ({
               onClick={onDeleteCharacter}
               aria-label="מחק תו"
             >
-              <i className="fas fa-backspace" style={{...buttonIconStyle, fontSize: '18px'}}></i>
+              <i className="fas fa-backspace" style={{ ...buttonIconStyle, fontSize: '18px' }}></i>
               מחק
             </button>
             <button
@@ -420,7 +420,7 @@ const Keyboard = ({
         </div>
         <div className="action-section">
           <div className="section-title">
-            <i className="fas fa-globe" style={{...iconStyle, fontSize: '15px'}}></i>
+            <i className="fas fa-globe" style={{ ...iconStyle, fontSize: '15px' }}></i>
             שפה
           </div>
           <div className="control-row">
@@ -431,7 +431,7 @@ const Keyboard = ({
             >
               <option value="hebrew">עברית</option>
               <option value="english">English</option>
-              <option value="emoji">אימוג'י</option>
+              <option value="emoji">Emoji</option>
             </select>
           </div>
         </div>
