@@ -83,6 +83,35 @@ function App() {
   };
 
   // Function to create a new document
+  // const createNewDocument = () => {
+  //   const defaultStyle = {
+  //     fontFamily: 'Arial',
+  //     fontSize: '16px',
+  //     color: '#000000',
+  //     fontWeight: 'normal',
+  //     fontStyle: 'normal',
+  //     textDecoration: 'none',
+  //     direction: 'rtl', // Default for Hebrew
+  //   };
+
+  //   const newDocument = {
+  //     name: `פתק ${documents.length + 1}`,
+  //     // Instead of storing just regular content, we store an array of text segments with style for each
+  //     textSegments: [],
+  //     // We also store the full text for convenience
+  //     fullContent: '',
+  //     // We store the general style as default
+  //     defaultStyle: { ...defaultStyle }
+  //   };
+
+  //   // Update the documents and set the new document as active
+  //   const newDocuments = [...documents, newDocument];
+  //   setDocuments(newDocuments);
+  //   setActiveDocumentIndex(newDocuments.length - 1);
+  //   setCurrentStyle(defaultStyle);
+  //   setCursorPosition(0);
+  // };
+
   const createNewDocument = () => {
     const defaultStyle = {
       fontFamily: 'Arial',
@@ -94,23 +123,33 @@ function App() {
       direction: 'rtl', // Default for Hebrew
     };
 
+    // יצירת מסמך ריק עם סגנון ברירת מחדל
     const newDocument = {
       name: `פתק ${documents.length + 1}`,
-      // Instead of storing just regular content, we store an array of text segments with style for each
       textSegments: [],
-      // We also store the full text for convenience
       fullContent: '',
-      // We store the general style as default
       defaultStyle: { ...defaultStyle }
     };
 
-    // Update the documents and set the new document as active
+    // עדכון רשימת המסמכים והגדרת המסמך החדש כפעיל
     const newDocuments = [...documents, newDocument];
     setDocuments(newDocuments);
     setActiveDocumentIndex(newDocuments.length - 1);
     setCurrentStyle(defaultStyle);
     setCursorPosition(0);
+
+    // יצירת היסטוריה התחלתית - חשוב מאוד
+    // שימרת העתק עמוק של המסמך הריק עם מיקום סמן 0
+    const initialState = JSON.parse(JSON.stringify(newDocument));
+    initialState.cursorPosition = 0;
+
+    const newHistory = [initialState];
+    setHistory(newHistory);
+    setHistoryIndex(0);
+
+    console.log('נוצר מסמך חדש עם היסטוריה התחלתית');
   };
+
 
   // Function to open a new document
   const openNewDocument = (textSegments, defaultStyle, name) => {
@@ -217,25 +256,193 @@ function App() {
   };
 
   // Function to add a character
+  // const addCharacter = (char) => {
+  //   if (activeDocumentIndex >= 0) {
+  //     // Validate that the character is valid
+  //     if (char === undefined || char === null) {
+  //       console.error("Character is undefined or null");
+  //       return;
+  //     }
+
+  //     // Ensure the character is a string
+  //     const charToAdd = char;
+  //     const isEmoji = emojiRegex().test(charToAdd);
+  //     const newDocuments = [...documents];
+  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+
+  //     // Make sure text segments exist
+  //     if (!currentDoc.textSegments) {
+  //       currentDoc.textSegments = [];
+  //     }
+
+  //     if (isEmoji) {
+  //       currentDoc.textSegments.push({
+  //         text: charToAdd,
+  //         style: { ...currentStyle }
+  //       });
+  //       currentDoc.fullContent = charToAdd;
+
+  //       newDocuments[activeDocumentIndex] = currentDoc;
+  //       setDocuments(newDocuments);
+  //       setCursorPosition(cursorPosition + charToAdd.length);
+  //       return;
+
+  //     }
+
+  //     if (currentDoc.textSegments.length === 0) {
+  //       // If no text segments exist, create a new one
+  //       currentDoc.textSegments.push({
+  //         text: charToAdd,
+  //         style: { ...currentStyle }
+  //       });
+  //       currentDoc.fullContent = charToAdd;
+
+  //       newDocuments[activeDocumentIndex] = currentDoc;
+  //       setDocuments(newDocuments);
+  //       setCursorPosition(1);
+  //       return;
+  //     }
+
+
+  //     // Find the segment and relative position
+  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
+
+  //     if (applyStyleFromNow) {
+  //       // "Apply from now on" mode - check whether to create a new segment or split the existing one
+
+  //       if (segmentIndex >= 0 && localPosition === currentDoc.textSegments[segmentIndex].text.length) {
+  //         // Cursor is at the end of an existing segment, check if styles match
+  //         const currentSegment = currentDoc.textSegments[segmentIndex];
+  //         const isSameStyle = JSON.stringify(currentSegment.style) === JSON.stringify(currentStyle);
+
+  //         if (isSameStyle) {
+  //           // If style matches, add character to the current segment
+  //           currentSegment.text += charToAdd;
+  //         } else {
+  //           // If style is different, create a new segment
+  //           currentDoc.textSegments.splice(segmentIndex + 1, 0, {
+  //             text: charToAdd,
+  //             style: { ...currentStyle }
+  //           });
+  //         }
+  //       } else if (segmentIndex >= 0) {
+  //         // Cursor is inside an existing segment, need to split it
+  //         const currentSegment = currentDoc.textSegments[segmentIndex];
+  //         const beforeText = currentSegment.text.substring(0, localPosition);
+  //         const afterText = currentSegment.text.substring(localPosition);
+
+  //         // Update the current segment with the text before the cursor
+  //         currentSegment.text = beforeText;
+
+  //         // Insert a new segment with the new character
+  //         currentDoc.textSegments.splice(segmentIndex + 1, 0, {
+  //           text: charToAdd,
+  //           style: { ...currentStyle }
+  //         });
+
+  //         // Insert another segment with the remaining text (if any)
+  //         if (afterText) {
+  //           currentDoc.textSegments.splice(segmentIndex + 2, 0, {
+  //             text: afterText,
+  //             style: { ...currentSegment.style }
+  //           });
+  //         }
+  //       } else {
+  //         // No appropriate segment found, create a new one
+  //         currentDoc.textSegments.push({
+  //           text: charToAdd,
+  //           style: { ...currentStyle }
+  //         });
+  //       }
+  //     } else {
+  //       // "All text" mode - apply a unified style to the whole document
+
+  //       if (currentDoc.textSegments.length === 1) {
+  //         // Only one segment exists, update it
+  //         const segment = currentDoc.textSegments[0];
+
+  //         const beforeText = segment.text.substring(0, localPosition);
+  //         const afterText = segment.text.substring(localPosition);
+
+  //         // Update the segment with the added character
+  //         segment.text = beforeText + charToAdd + afterText;
+  //         segment.style = { ...currentStyle };
+  //       } else {
+  //         // Multiple segments exist, merge them into one
+  //         const fullText = currentDoc.fullContent;
+  //         const beforeText = fullText.substring(0, cursorPosition);
+  //         const afterText = fullText.substring(cursorPosition);
+
+  //         // Replace all segments with a single one
+  //         currentDoc.textSegments = [{
+  //           text: beforeText + charToAdd + afterText,
+  //           style: { ...currentStyle }
+  //         }];
+  //       }
+  //     }
+
+  //     // Update the full content
+  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+
+  //     newDocuments[activeDocumentIndex] = currentDoc;
+  //     setDocuments(newDocuments);
+  //     setCursorPosition(cursorPosition + 1);
+
+  //     // Save in history (optional to improve performance)
+  //     if (historyIndex >= 0 && history.length > 0) {
+  //       const lastHistory = history[historyIndex];
+  //       // Save to history only if there is a significant change
+  //       if (lastHistory.fullContent.length + 5 < currentDoc.fullContent.length) {
+  //         const newHistory = [...history.slice(0, historyIndex + 1)];
+  //         newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+  //         setHistory(newHistory);
+  //         setHistoryIndex(newHistory.length - 1);
+  //       }
+  //     }
+  //   } else if (documents.length === 0) {
+  //     // If there are no documents and the user is connected, create a new document
+  //     if (currentUser && currentUser !== 'default') {
+  //       createNewDocument();
+  //       // Retry after creating a new document
+  //       setTimeout(() => addCharacter(char), 10);
+  //     } else {
+  //       showMessage('You must be logged in to create a new note.', 'error');
+  //     }
+  //   }
+  // };
   const addCharacter = (char) => {
     if (activeDocumentIndex >= 0) {
-      // Validate that the character is valid
+      // וידוא שהמצב ההתחלתי (ריק) נשמר אם זו הפעולה הראשונה
+      if (historyIndex === -1) {
+        // אין עדיין היסטוריה - נשמור את המצב ההתחלתי
+        const emptyDoc = JSON.parse(JSON.stringify(documents[activeDocumentIndex]));
+        emptyDoc.cursorPosition = 0;
+
+        const newHistory = [emptyDoc];
+        setHistory(newHistory);
+        setHistoryIndex(0);
+
+        console.log('נוצרה היסטוריה התחלתית עם מסמך ריק');
+      }
+
+      // וידוא שהתו תקין
       if (char === undefined || char === null) {
-        console.error("Character is undefined or null");
+        console.error("התו אינו תקין (undefined או null)");
         return;
       }
 
-      // Ensure the character is a string
+      // וידוא שהתו הוא מחרוזת
       const charToAdd = char;
       const isEmoji = emojiRegex().test(charToAdd);
       const newDocuments = [...documents];
-      const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+      const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // העתקה עמוקה
 
-      // Make sure text segments exist
+      // וידוא שקיימים מקטעי טקסט
       if (!currentDoc.textSegments) {
         currentDoc.textSegments = [];
       }
 
+      // טיפול מיוחד באימוג'י
       if (isEmoji) {
         currentDoc.textSegments.push({
           text: charToAdd,
@@ -245,13 +452,27 @@ function App() {
 
         newDocuments[activeDocumentIndex] = currentDoc;
         setDocuments(newDocuments);
-        setCursorPosition(cursorPosition + charToAdd.length);
-        return;
 
+        // חישוב המיקום החדש של הסמן
+        const newCursorPosition = cursorPosition + charToAdd.length;
+        setCursorPosition(newCursorPosition);
+
+        // שמירה בהיסטוריה עם מיקום הסמן החדש
+        const newHistory = [...history.slice(0, historyIndex + 1)];
+        const stateToSave = JSON.parse(JSON.stringify(currentDoc));
+        stateToSave.cursorPosition = newCursorPosition; // שמירת מיקום הסמן
+        newHistory.push(stateToSave);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+
+        console.log('נשמר להיסטוריה:', newHistory.length - 1,
+          'אחרי הוספת אימוג׳י, מיקום סמן:', newCursorPosition);
+
+        return;
       }
 
+      // אם אין מקטעי טקסט, ניצור חדש
       if (currentDoc.textSegments.length === 0) {
-        // If no text segments exist, create a new one
         currentDoc.textSegments.push({
           text: charToAdd,
           style: { ...currentStyle }
@@ -260,48 +481,62 @@ function App() {
 
         newDocuments[activeDocumentIndex] = currentDoc;
         setDocuments(newDocuments);
-        setCursorPosition(1);
+
+        // חישוב המיקום החדש של הסמן
+        const newCursorPosition = 1;
+        setCursorPosition(newCursorPosition);
+
+        // שמירה בהיסטוריה עם מיקום הסמן החדש
+        const newHistory = [...history.slice(0, historyIndex + 1)];
+        const stateToSave = JSON.parse(JSON.stringify(currentDoc));
+        stateToSave.cursorPosition = newCursorPosition; // שמירת מיקום הסמן
+        newHistory.push(stateToSave);
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+
+        console.log('נשמר להיסטוריה:', newHistory.length - 1,
+          'תוכן ראשוני, מיקום סמן:', newCursorPosition);
+
         return;
       }
 
-
-      // Find the segment and relative position
+      // חיפוש המקטע והמיקום היחסי
       const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
 
       if (applyStyleFromNow) {
-        // "Apply from now on" mode - check whether to create a new segment or split the existing one
+        // מצב "מכאן והלאה" - בדיקה האם ליצור מקטע חדש או לפצל את הקיים
 
         if (segmentIndex >= 0 && localPosition === currentDoc.textSegments[segmentIndex].text.length) {
-          // Cursor is at the end of an existing segment, check if styles match
+          // הסמן בסוף מקטע קיים, נבדוק אם הסגנונות תואמים
           const currentSegment = currentDoc.textSegments[segmentIndex];
           const isSameStyle = JSON.stringify(currentSegment.style) === JSON.stringify(currentStyle);
 
           if (isSameStyle) {
-            // If style matches, add character to the current segment
+            // אם הסגנון תואם, נוסיף את התו למקטע הנוכחי
             currentSegment.text += charToAdd;
           } else {
-            // If style is different, create a new segment
+            // אם הסגנון שונה, ניצור מקטע חדש
             currentDoc.textSegments.splice(segmentIndex + 1, 0, {
               text: charToAdd,
               style: { ...currentStyle }
             });
           }
         } else if (segmentIndex >= 0) {
-          // Cursor is inside an existing segment, need to split it
+          // הסמן בתוך מקטע קיים, יש לפצל אותו
           const currentSegment = currentDoc.textSegments[segmentIndex];
           const beforeText = currentSegment.text.substring(0, localPosition);
           const afterText = currentSegment.text.substring(localPosition);
 
-          // Update the current segment with the text before the cursor
+          // עדכון המקטע הנוכחי עם הטקסט לפני הסמן
           currentSegment.text = beforeText;
 
-          // Insert a new segment with the new character
+          // הוספת מקטע חדש עם התו החדש
           currentDoc.textSegments.splice(segmentIndex + 1, 0, {
             text: charToAdd,
             style: { ...currentStyle }
           });
 
-          // Insert another segment with the remaining text (if any)
+          // הוספת עוד מקטע עם הטקסט הנותר (אם יש)
           if (afterText) {
             currentDoc.textSegments.splice(segmentIndex + 2, 0, {
               text: afterText,
@@ -309,32 +544,32 @@ function App() {
             });
           }
         } else {
-          // No appropriate segment found, create a new one
+          // לא נמצא מקטע מתאים, ניצור חדש
           currentDoc.textSegments.push({
             text: charToAdd,
             style: { ...currentStyle }
           });
         }
       } else {
-        // "All text" mode - apply a unified style to the whole document
+        // מצב "כל הטקסט" - החלת סגנון אחיד על כל המסמך
 
         if (currentDoc.textSegments.length === 1) {
-          // Only one segment exists, update it
+          // קיים רק מקטע אחד, נעדכן אותו
           const segment = currentDoc.textSegments[0];
 
           const beforeText = segment.text.substring(0, localPosition);
           const afterText = segment.text.substring(localPosition);
 
-          // Update the segment with the added character
+          // עדכון המקטע עם התו המוסף
           segment.text = beforeText + charToAdd + afterText;
           segment.style = { ...currentStyle };
         } else {
-          // Multiple segments exist, merge them into one
+          // קיימים מקטעים מרובים, נמזג אותם לאחד
           const fullText = currentDoc.fullContent;
           const beforeText = fullText.substring(0, cursorPosition);
           const afterText = fullText.substring(cursorPosition);
 
-          // Replace all segments with a single one
+          // החלפת כל המקטעים במקטע אחד
           currentDoc.textSegments = [{
             text: beforeText + charToAdd + afterText,
             style: { ...currentStyle }
@@ -342,32 +577,34 @@ function App() {
         }
       }
 
-      // Update the full content
+      // עדכון התוכן המלא
       currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
 
       newDocuments[activeDocumentIndex] = currentDoc;
       setDocuments(newDocuments);
-      setCursorPosition(cursorPosition + 1);
 
-      // Save in history (optional to improve performance)
-      if (historyIndex >= 0 && history.length > 0) {
-        const lastHistory = history[historyIndex];
-        // Save to history only if there is a significant change
-        if (lastHistory.fullContent.length + 5 < currentDoc.fullContent.length) {
-          const newHistory = [...history.slice(0, historyIndex + 1)];
-          newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
-          setHistory(newHistory);
-          setHistoryIndex(newHistory.length - 1);
-        }
-      }
+      // חישוב המיקום החדש של הסמן
+      const newCursorPosition = cursorPosition + 1;
+      setCursorPosition(newCursorPosition);
+
+      // שמירה בהיסטוריה עם מיקום הסמן
+      const newHistory = [...history.slice(0, historyIndex + 1)];
+      const stateToSave = JSON.parse(JSON.stringify(currentDoc));
+      stateToSave.cursorPosition = newCursorPosition; // שמירת מיקום הסמן
+      newHistory.push(stateToSave);
+      setHistory(newHistory);
+      setHistoryIndex(newHistory.length - 1);
+
+      console.log('נשמר להיסטוריה:', newHistory.length - 1,
+        'אחרי הוספת תו, מיקום סמן:', newCursorPosition);
     } else if (documents.length === 0) {
-      // If there are no documents and the user is connected, create a new document
+      // אם אין מסמכים והמשתמש מחובר, ניצור מסמך חדש
       if (currentUser && currentUser !== 'default') {
         createNewDocument();
-        // Retry after creating a new document
+        // ננסה שוב אחרי יצירת מסמך חדש
         setTimeout(() => addCharacter(char), 10);
       } else {
-        showMessage('You must be logged in to create a new note.', 'error');
+        showMessage('יש להתחבר כדי ליצור פתק חדש.', 'error');
       }
     }
   };
@@ -375,6 +612,283 @@ function App() {
 
 
   // Function to delete a character
+  // const deleteCharacter = () => {
+  //   if (activeDocumentIndex >= 0) {
+  //     const newDocuments = [...documents];
+  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+
+  //     if (!currentDoc.textSegments || currentDoc.textSegments.length === 0 || !currentDoc.fullContent || cursorPosition === 0) {
+  //       return; // Nothing to delete
+  //     }
+
+  //     // Find the segment and relative position
+  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
+
+  //     if (localPosition > 0) {
+  //       // Delete a character within an existing segment
+  //       const segment = currentDoc.textSegments[segmentIndex];
+  //       let beforeDelete = segment.text.substring(0, localPosition - 1);
+  //       let afterDelete = segment.text.substring(localPosition);
+
+  //       // Check if the previous character is an emoji using emojiRegex
+  //       const prevChar = beforeDelete[beforeDelete.length - 1];
+  //       const isEmoji = emojiRegex().test(prevChar);
+
+  //       if (isEmoji) {
+  //         // If it's an emoji, delete 2 characters
+  //         beforeDelete = beforeDelete.substring(0, beforeDelete.length - 2);
+  //       } else {
+  //         // Otherwise, delete just 1 character (regular char)
+  //         beforeDelete = beforeDelete.substring(0, beforeDelete.length - 1);
+  //       }
+
+  //       if (beforeDelete.length === 0 && afterDelete.length === 0) {
+  //         // The segment became empty - delete it
+  //         currentDoc.textSegments.splice(segmentIndex, 1);
+  //       } else {
+  //         // Update the existing segment
+  //         segment.text = beforeDelete + afterDelete;
+  //       }
+  //     } else if (segmentIndex > 0) {
+  //       // Delete a character at the boundary between segments - delete the last character in the previous segment
+  //       const prevSegment = currentDoc.textSegments[segmentIndex - 1];
+
+  //       if (prevSegment.text.length === 1) {
+  //         // If only one character remains in the previous segment, delete the entire segment
+  //         currentDoc.textSegments.splice(segmentIndex - 1, 1);
+  //       } else {
+  //         // Otherwise, delete just the last character
+  //         prevSegment.text = prevSegment.text.substring(0, prevSegment.text.length - 1);
+  //       }
+  //     }
+
+  //     // Remove empty segments
+  //     currentDoc.textSegments = currentDoc.textSegments.filter(segment => segment.text.length > 0);
+
+  //     // Merge adjacent segments with the same style in "All text" mode
+  //     if (!applyStyleFromNow) {
+  //       // In "All text" mode, merge all segments into one
+  //       if (currentDoc.textSegments.length > 0) {
+  //         const fullText = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+  //         currentDoc.textSegments = [{
+  //           text: fullText,
+  //           style: { ...currentStyle }
+  //         }];
+  //       }
+  //     } else {
+  //       // In "From now on" mode, check if there are adjacent segments with the same style to merge
+  //       for (let i = 0; i < currentDoc.textSegments.length - 1; i++) {
+  //         const current = currentDoc.textSegments[i];
+  //         const next = currentDoc.textSegments[i + 1];
+
+  //         if (JSON.stringify(current.style) === JSON.stringify(next.style)) {
+  //           // If two adjacent segments have the same style, merge them
+  //           current.text += next.text;
+  //           currentDoc.textSegments.splice(i + 1, 1);
+  //           i--; // Check the same segment again
+  //         }
+  //       }
+  //     }
+
+  //     // Update the full content
+  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+
+  //     newDocuments[activeDocumentIndex] = currentDoc;
+  //     setDocuments(newDocuments);
+  //     setCursorPosition(cursorPosition - 1);
+
+  //     // Save in history
+  //     const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
+  //     newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+  //     setHistory(newHistory);
+  //     setHistoryIndex(newHistory.length - 1);
+  //   }
+  // };
+  // const deleteCharacter = () => {
+  //   if (activeDocumentIndex >= 0) {
+  //     // וידוא שהמצב ההתחלתי (ריק) נשמר אם זו הפעולה הראשונה
+  //     if (historyIndex === -1) {
+  //       // אין עדיין היסטוריה - נשמור את המצב ההתחלתי
+  //       const emptyDoc = JSON.parse(JSON.stringify(documents[activeDocumentIndex]));
+  //       emptyDoc.cursorPosition = 0;
+
+  //       const newHistory = [emptyDoc];
+  //       setHistory(newHistory);
+  //       setHistoryIndex(0);
+
+  //       console.log('נוצרה היסטוריה התחלתית עם מסמך ריק (לפני מחיקה)');
+  //     }
+
+  //     const newDocuments = [...documents];
+  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // העתקה עמוקה
+
+  //     // אין מה למחוק אם המסמך ריק או שהסמן בהתחלה
+  //     if (!currentDoc.textSegments || currentDoc.textSegments.length === 0 || !currentDoc.fullContent || cursorPosition === 0) {
+  //       return; // אין מה למחוק
+  //     }
+
+  //     // חיפוש המקטע והמיקום היחסי
+  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
+
+  //     if (localPosition > 0) {
+  //       // מחיקת תו בתוך מקטע קיים
+  //       const segment = currentDoc.textSegments[segmentIndex];
+  //       const beforeDelete = segment.text.substring(0, localPosition - 1);
+  //       const afterDelete = segment.text.substring(localPosition);
+
+  //       const charToDelete = segment.text.charAt(localPosition - 1);
+  //       const isEmoji = emojiRegex().test(charToDelete);
+  //       let charsToDelete = 1;
+  //       // if(!isEmoji){
+  //       //   charsToDelete=0;
+  //       // }
+
+
+
+  //       // המחיקה עצמה - בצורה בטוחה
+  //       const newBeforeText = beforeDelete.substring(0, beforeDelete.length - charsToDelete);
+
+  //       if (newBeforeText.length === 0 && afterDelete.length === 0) {
+  //         // המקטע הפך לריק - נמחק אותו
+  //         currentDoc.textSegments.splice(segmentIndex, 1);
+  //       } else {
+  //         // עדכון המקטע הקיים
+  //         segment.text = newBeforeText + afterDelete;
+  //       }
+  //     } else if (segmentIndex > 0) {
+  //       // מחיקת תו בגבול בין מקטעים - מחיקת התו האחרון במקטע הקודם
+  //       const prevSegment = currentDoc.textSegments[segmentIndex - 1];
+
+  //       if (prevSegment.text.length === 1) {
+  //         // אם נשאר רק תו אחד במקטע הקודם, נמחק את כל המקטע
+  //         currentDoc.textSegments.splice(segmentIndex - 1, 1);
+  //       } else {
+  //         // אחרת, נמחק רק את התו האחרון
+  //         prevSegment.text = prevSegment.text.substring(0, prevSegment.text.length - 1);
+  //       }
+  //     }
+  //     // מחיקת תו בתוך מקטע קיים
+  //     // if (localPosition > 0) {
+  //     //   // מחיקת תו בתוך מקטע קיים
+  //     //   const segment = currentDoc.textSegments[segmentIndex];
+
+  //     //   // בדיקה אם התו הקודם הוא אימוג'י
+  //     //   const charToDelete = segment.text.charAt(localPosition - 1);
+  //     //   const isEmoji = emojiRegex().test(charToDelete);
+
+  //     //   console.log('מוחק תו:', { 
+  //     //     charToDelete, 
+  //     //     isEmoji,
+  //     //     textBeforeDeletion: segment.text
+  //     //   });
+
+  //     //   if (isEmoji) {
+  //     //     // טיפול באימוג'י - מחיקה תמיד תו אחד בלבד
+  //     //     const beforeText = segment.text.substring(0, localPosition - 1);
+  //     //     beforeText = segment.text.substring(0, localPosition - 1);
+  //     //     const afterText = segment.text.substring(localPosition);
+  //     //     segment.text = beforeText + afterText;
+  //     //     console.log('מחיקת אימוג׳י אחד');
+  //     //   } else {
+  //     //     // טיפול בתו רגיל - מחיקה תמיד תו אחד בדיוק
+  //     //     const beforeText = segment.text.substring(0, localPosition-1);
+  //     //     const afterText = segment.text.substring(localPosition);
+  //     //     segment.text = beforeText + afterText;
+  //     //     console.log('מחיקת תו רגיל אחד');
+  //     //   }
+
+  //     //   console.log('אחרי מחיקה:', {
+  //     //     textAfter: segment.text
+  //     //   });
+
+  //     //   // אם המקטע הפך לריק, מוחקים אותו
+  //     //   if (segment.text.length === 0) {
+  //     //     currentDoc.textSegments.splice(segmentIndex, 1);
+  //     //   }
+  //     // } else if (segmentIndex > 0) {
+  //     //   // מחיקת תו בגבול בין מקטעים - מחיקת התו האחרון במקטע הקודם
+  //     //   const prevSegment = currentDoc.textSegments[segmentIndex - 1];
+
+  //     //   // בדיקה אם התו האחרון במקטע הקודם הוא אימוג'י
+  //     //   const lastChar = prevSegment.text.charAt(prevSegment.text.length - 1);
+  //     //   const isLastCharEmoji = emojiRegex().test(lastChar);
+
+  //     //   console.log('מוחק תו בגבול:', { 
+  //     //     lastChar,
+  //     //     isLastCharEmoji,
+  //     //     segmentBefore: prevSegment.text 
+  //     //   });
+  //     //   if (prevSegment.text.length === 1) {
+  //     //     // אם נשאר רק תו אחד במקטע הקודם, נמחק את כל המקטע
+  //     //     currentDoc.textSegments.splice(segmentIndex - 1, 1);
+  //     //   } else {
+  //     //     if (isLastCharEmoji) {
+  //     //       // אם זה אימוג'י - מחיקה של תו אחד בלבד
+  //     //       prevSegment.text = prevSegment.text.substring(0, prevSegment.text.length - 1);
+  //     //       console.log('מחיקת אימוג׳י אחד בגבול');
+  //     //     } else {
+  //     //       // אם זה תו רגיל - מחיקה של תו אחד בדיוק
+  //     //       prevSegment.text = prevSegment.text.substring(0, prevSegment.text.length - 1);
+  //     //       console.log('מחיקת תו רגיל אחד בגבול');
+  //     //     }
+  //     //   }
+
+  //     //   console.log('אחרי מחיקה בגבול:', { 
+  //     //     segmentAfter: prevSegment.text 
+  //     //   });
+  //     // }
+
+
+  //     // הסרת מקטעים ריקים
+  //     currentDoc.textSegments = currentDoc.textSegments.filter(segment => segment.text.length > 0);
+
+  //     // מיזוג מקטעים סמוכים עם אותו סגנון במצב "כל הטקסט"
+  //     if (!applyStyleFromNow) {
+  //       // במצב "כל הטקסט", ממזגים את כל המקטעים לאחד
+  //       if (currentDoc.textSegments.length > 0) {
+  //         const fullText = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+  //         currentDoc.textSegments = [{
+  //           text: fullText,
+  //           style: { ...currentStyle }
+  //         }];
+  //       }
+  //     } else {
+  //       // במצב "מכאן והלאה", בודקים אם יש מקטעים סמוכים עם אותו סגנון כדי למזג
+  //       for (let i = 0; i < currentDoc.textSegments.length - 1; i++) {
+  //         const current = currentDoc.textSegments[i];
+  //         const next = currentDoc.textSegments[i + 1];
+
+  //         if (JSON.stringify(current.style) === JSON.stringify(next.style)) {
+  //           // אם לשני מקטעים סמוכים יש אותו סגנון, ממזגים אותם
+  //           current.text += next.text;
+  //           currentDoc.textSegments.splice(i + 1, 1);
+  //           i--; // בדיקת אותו מקטע שוב
+  //         }
+  //       }
+  //     }
+
+  //     // עדכון התוכן המלא
+  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+
+  //     newDocuments[activeDocumentIndex] = currentDoc;
+  //     setDocuments(newDocuments);
+
+  //     // חישוב המיקום החדש של הסמן
+  //     const newCursorPosition = Math.max(0, cursorPosition - 1);
+  //     setCursorPosition(newCursorPosition);
+
+  //     // שמירה בהיסטוריה - עם מיקום הסמן החדש
+  //     const newHistory = [...history.slice(0, historyIndex + 1)];
+  //     const stateToSave = JSON.parse(JSON.stringify(currentDoc));
+  //     stateToSave.cursorPosition = newCursorPosition; // שמירת מיקום הסמן
+  //     newHistory.push(stateToSave);
+  //     setHistory(newHistory);
+  //     setHistoryIndex(newHistory.length - 1);
+
+  //     console.log('נשמר להיסטוריה:', newHistory.length - 1, 
+  //                'אחרי מחיקת תו, מיקום סמן:', newCursorPosition);
+  //   }
+  // };
   const deleteCharacter = () => {
     if (activeDocumentIndex >= 0) {
       const newDocuments = [...documents];
@@ -395,16 +909,26 @@ function App() {
 
         // Check if the previous character is an emoji using emojiRegex
         const prevChar = beforeDelete[beforeDelete.length - 1];
-        const isEmoji = emojiRegex().test(prevChar);
 
-        if (isEmoji) {
+        const regularChar = [
+          ['/', 'י', 'ק', 'ר', 'א', 'ט', 'ו', 'ן', 'ם', 'פ', 'ש', '%'],
+          ['ד', 'ג', 'כ', 'ע', 'ח', 'ל', 'ך', 'ף', 'ז', 'ס', '$'],
+          [')', '(', 'ב', 'ה', 'נ', 'מ', 'צ', 'ת', 'ץ', '.', '#', '^'],
+          ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '!', '@'],
+          ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'b', 'n'],
+          ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'v', 'm', 'c'],
+          ['z', 'x', ';', ',', '&', '*']
+        ];
+        const notEmoji = regularChar.flat().includes(prevChar);
+
+        if (notEmoji) {
           // If it's an emoji, delete 2 characters
-          beforeDelete = beforeDelete.substring(0, beforeDelete.length - 2);
+          beforeDelete = beforeDelete.substring(0, beforeDelete.length);
         } else {
           // Otherwise, delete just 1 character (regular char)
-          beforeDelete = beforeDelete.substring(0, beforeDelete.length - 1);
+          beforeDelete = beforeDelete.substring(0, beforeDelete.length-1);
+          console.log("delete: " + prevChar);
         }
-
         if (beforeDelete.length === 0 && afterDelete.length === 0) {
           // The segment became empty - delete it
           currentDoc.textSegments.splice(segmentIndex, 1);
@@ -819,87 +1343,179 @@ function App() {
   // };
 
   // Function to replace text
-const replaceText = (searchTerm, replaceTerm) => {
-  if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
-    const newDocuments = [...documents];
-    const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
+  const replaceText = (searchTerm, replaceTerm) => {
+    if (activeDocumentIndex >= 0 && searchTerm && replaceTerm) {
+      const newDocuments = [...documents];
+      const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
 
-    let replacementCount = 0;
+      let replacementCount = 0;
 
-    // Check if replacement is needed
-    if (currentDoc.fullContent.includes(searchTerm)) {
-      if (!applyStyleFromNow) {
-        // In "All text" mode - simple replacement
-        currentDoc.fullContent = currentDoc.fullContent.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+      // Check if replacement is needed
+      if (currentDoc.fullContent.includes(searchTerm)) {
+        if (!applyStyleFromNow) {
+          // In "All text" mode - simple replacement
+          currentDoc.fullContent = currentDoc.fullContent.replace(new RegExp(searchTerm, 'g'), replaceTerm);
 
-        // Update the content in the single segment
-        if (currentDoc.textSegments.length === 1) {
-          currentDoc.textSegments[0].text = currentDoc.fullContent;
-        } else if (currentDoc.textSegments.length > 1) {
-          // Merge all segments into one
-          currentDoc.textSegments = [{
-            text: currentDoc.fullContent,
-            style: { ...currentStyle }
-          }];
-        }
-
-        replacementCount = (currentDoc.fullContent.match(new RegExp(replaceTerm, 'g')) || []).length;
-      } else {
-        // In "From now on" mode - replacement while preserving segment structure
-        // Go through all segments and perform replacement
-        for (let i = 0; i < currentDoc.textSegments.length; i++) {
-          const segment = currentDoc.textSegments[i];
-
-          if (segment.text.includes(searchTerm)) {
-            // Count how many times the search term appears in the segment
-            const count = (segment.text.match(new RegExp(searchTerm, 'g')) || []).length;
-            replacementCount += count;
-
-            // Replace all occurrences in the segment
-            segment.text = segment.text.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+          // Update the content in the single segment
+          if (currentDoc.textSegments.length === 1) {
+            currentDoc.textSegments[0].text = currentDoc.fullContent;
+          } else if (currentDoc.textSegments.length > 1) {
+            // Merge all segments into one
+            currentDoc.textSegments = [{
+              text: currentDoc.fullContent,
+              style: { ...currentStyle }
+            }];
           }
+
+          replacementCount = (currentDoc.fullContent.match(new RegExp(replaceTerm, 'g')) || []).length;
+        } else {
+          // In "From now on" mode - replacement while preserving segment structure
+          // Go through all segments and perform replacement
+          for (let i = 0; i < currentDoc.textSegments.length; i++) {
+            const segment = currentDoc.textSegments[i];
+
+            if (segment.text.includes(searchTerm)) {
+              // Count how many times the search term appears in the segment
+              const count = (segment.text.match(new RegExp(searchTerm, 'g')) || []).length;
+              replacementCount += count;
+
+              // Replace all occurrences in the segment
+              segment.text = segment.text.replace(new RegExp(searchTerm, 'g'), replaceTerm);
+            }
+          }
+
+          // Update the full content
+          currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
         }
 
-        // Update the full content
-        currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
+        newDocuments[activeDocumentIndex] = currentDoc;
+        setDocuments(newDocuments);
+
+        // Save in history
+        const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
+        newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
+        setHistory(newHistory);
+        setHistoryIndex(newHistory.length - 1);
+
+        // Show success message
+        showMessage(`הוחלפו ${replacementCount} מופעים של "${searchTerm}" ב"${replaceTerm}"`, "success");
+      } else {
+        // Show error message
+        showMessage(`לא נמצאו המילים "${searchTerm}" במסמך`, "error");
       }
-
-      newDocuments[activeDocumentIndex] = currentDoc;
-      setDocuments(newDocuments);
-
-      // Save in history
-      const newHistory = historyIndex >= 0 ? history.slice(0, historyIndex + 1) : [];
-      newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
-      setHistory(newHistory);
-      setHistoryIndex(newHistory.length - 1);
-
-      // Show success message
-      showMessage(`הוחלפו ${replacementCount} מופעים של "${searchTerm}" ב"${replaceTerm}"`, "success");
-    } else {
-      // Show error message
-      showMessage(`לא נמצאו המילים "${searchTerm}" במסמך`, "error");
     }
-  }
-};
+  };
 
 
   // Function to perform undo
+  // const undo = () => {
+  //   if (historyIndex > 0 && activeDocumentIndex >= 0) {
+  //     const newIndex = historyIndex - 1;
+  //     const previousState = history[newIndex];
+
+  //     const newDocuments = [...documents];
+  //     newDocuments[activeDocumentIndex] = JSON.parse(JSON.stringify(previousState)); // Deep copy
+
+  //     setDocuments(newDocuments);
+  //     if (previousState.defaultStyle) {
+  //       setCurrentStyle(previousState.defaultStyle);
+  //     }
+  //     setHistoryIndex(newIndex);
+  //     setCursorPosition(previousState.fullContent ? previousState.fullContent.length : 0);
+  //   }
+  // };
+  // const undo = () => {
+  //   // בדיקה שיש מסמך פעיל והיסטוריה
+  //   if (activeDocumentIndex >= 0 && historyIndex > 0) {
+  //     // מעבר למצב הקודם בהיסטוריה
+  //     const newHistoryIndex = historyIndex - 1;
+  //     const previousState = history[newHistoryIndex];
+
+  //     if (!previousState) {
+  //       console.warn('אין מצב קודם בהיסטוריה');
+  //       return;
+  //     }
+
+  //     // יצירת עותק של המסמכים הנוכחיים
+  //     const newDocuments = [...documents];
+  //     // החלפת המסמך הפעיל במצב הקודם (עותק עמוק)
+  //     newDocuments[activeDocumentIndex] = JSON.parse(JSON.stringify(previousState));
+
+  //     // עדכון ה-state
+  //     setDocuments(newDocuments);
+  //     setHistoryIndex(newHistoryIndex);
+
+  //     // עדכון הסגנון והסמן
+  //     if (previousState.defaultStyle) {
+  //       setCurrentStyle(previousState.defaultStyle);
+  //     }
+
+  //     // שימוש במיקום הסמן השמור (אם קיים)
+  //     const newCursorPosition = previousState.cursorPosition !== undefined ?
+  //       previousState.cursorPosition :
+  //       (previousState.fullContent ? previousState.fullContent.length : 0);
+
+  //     setCursorPosition(newCursorPosition);
+
+  //     console.log('ביצוע Undo למצב:', newHistoryIndex,
+  //       'תוכן:', previousState.fullContent,
+  //       'מיקום סמן:', newCursorPosition);
+  //   }
+  // };
   const undo = () => {
-    if (historyIndex > 0 && activeDocumentIndex >= 0) {
-      const newIndex = historyIndex - 1;
-      const previousState = history[newIndex];
+    // וידוא שיש מסמך פעיל ושהיסטוריה קיימת (לפחות 2 מצבים)
+    if (activeDocumentIndex >= 0 && historyIndex > 0) {
+      // מעבר למצב הקודם בהיסטוריה
+      const newHistoryIndex = historyIndex - 1;
+      const previousState = history[newHistoryIndex];
 
+      if (!previousState) {
+        console.warn('אין מצב קודם בהיסטוריה');
+        return;
+      }
+
+      console.log('ביצוע undo למצב', newHistoryIndex, 'תוכן:',
+        previousState.fullContent, 'אורך:',
+        previousState.fullContent ? previousState.fullContent.length : 0);
+
+      // יצירת עותק של המסמכים הנוכחיים
       const newDocuments = [...documents];
-      newDocuments[activeDocumentIndex] = JSON.parse(JSON.stringify(previousState)); // Deep copy
 
+      // העתקת המצב הקודם (עותק עמוק) - אבל בלי השדה cursorPosition
+      const docCopy = JSON.parse(JSON.stringify(previousState));
+
+      // אם יש שדה cursorPosition במצב הקודם, נסיר אותו לפני השמה במסמך
+      // כי זה לא חלק ממבנה המסמך הרגיל
+      if (docCopy.cursorPosition !== undefined) {
+        delete docCopy.cursorPosition;
+      }
+
+      // החלפת המסמך הפעיל במצב הקודם
+      newDocuments[activeDocumentIndex] = docCopy;
+
+      // עדכון ה-state
       setDocuments(newDocuments);
+      setHistoryIndex(newHistoryIndex);
+
+      // עדכון הסגנון והסמן
       if (previousState.defaultStyle) {
         setCurrentStyle(previousState.defaultStyle);
       }
-      setHistoryIndex(newIndex);
-      setCursorPosition(previousState.fullContent ? previousState.fullContent.length : 0);
+
+      // שימוש במיקום הסמן השמור (אם קיים)
+      const newCursorPosition = previousState.cursorPosition !== undefined ?
+        previousState.cursorPosition :
+        (previousState.fullContent ? previousState.fullContent.length : 0);
+
+      console.log('מעדכן מיקום סמן ל:', newCursorPosition);
+      setCursorPosition(newCursorPosition);
+    } else {
+      console.log('לא ניתן לבצע undo - אין מספיק היסטוריה',
+        'historyIndex:', historyIndex,
+        'activeDocumentIndex:', activeDocumentIndex);
     }
   };
+
 
   // Function to load a document
   const loadDocument = (textSegments, defaultStyle, name = null) => {
