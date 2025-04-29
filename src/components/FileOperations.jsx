@@ -34,103 +34,6 @@ const FileOperations = ({
     setDocumentsList(list);
   };
 
-  // Save document - updated for multi-style support
-  // const saveDocument = () => {
-  //   // Check if user is logged in
-  //   if (!isLoggedIn()) {
-  //     displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
-  //     setShowSaveDialog(false);
-  //     return;
-  //   }
-
-  //   if (!documentName.trim()) {
-  //     displayMessage('נא להזין שם פתק', 'error');
-  //     return;
-  //   }
-
-  //   if (activeDocumentIndex < 0 || !documents[activeDocumentIndex]) {
-  //     displayMessage('אין פתק פעיל לשמירה', 'error');
-  //     return;
-  //   }
-
-  //   try {
-  //     const currentDoc = documents[activeDocumentIndex];
-
-  //     // Prepare data for saving
-  //     const documentData = {
-  //       textSegments: currentDoc.textSegments || [],
-  //       fullContent: currentDoc.fullContent || '',
-  //       defaultStyle: currentDoc.defaultStyle || {}
-  //     };
-
-  //     storageService.saveDocument(documentName, documentData, currentUser);
-  //     displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
-  //     setShowSaveDialog(false);
-  //     // Reload document list after save
-  //     loadDocumentsList();
-  //   } catch (error) {
-  //     displayMessage('שגיאה בשמירת הפתק', 'error');
-  //     console.error('Error saving document:', error);
-  //   }
-  // };
-
-  // בפונקציית saveDocument בקובץ FileOperations.jsx
-
-  // const saveDocument = () => {
-  //   // Check if user is logged in
-  //   if (!isLoggedIn()) {
-  //     displayMessage('עליך להתחבר כדי לשמור פתקים', 'error');
-  //     setShowSaveDialog(false);
-  //     return;
-  //   }
-
-  //   if (!documentName.trim()) {
-  //     displayMessage('נא להזין שם פתק', 'error');
-  //     return;
-  //   }
-
-  //   if (activeDocumentIndex < 0 || !documents[activeDocumentIndex]) {
-  //     displayMessage('אין פתק פעיל לשמירה', 'error');
-  //     return;
-  //   }
-
-  //   try {
-  //     const currentDoc = documents[activeDocumentIndex];
-
-  //     // Prepare data for saving
-  //     const documentData = {
-  //       textSegments: currentDoc.textSegments || [],
-  //       fullContent: currentDoc.fullContent || '',
-  //       defaultStyle: currentDoc.defaultStyle || {}
-  //     };
-
-  //     storageService.saveDocument(documentName, documentData, currentUser);
-
-  //     // Update the current document name to what was saved
-  //     const newDocuments = [...documents];
-  //     newDocuments[activeDocumentIndex] = {
-  //       ...newDocuments[activeDocumentIndex],
-  //       name: documentName
-  //     };
-
-  //     // Saving the changes
-  //     onLoadDocument(
-  //       currentDoc.textSegments,
-  //       currentDoc.defaultStyle,
-  //       documentName
-  //     );
-
-  //     displayMessage(`הפתק "${documentName}" נשמר בהצלחה`, 'success');
-  //     setShowSaveDialog(false);
-  //     // Reload document list after save
-  //     loadDocumentsList();
-  //   } catch (error) {
-  //     displayMessage('שגיאה בשמירת הפתק', 'error');
-  //     console.error('Error saving document:', error);
-  //   }
-  // };
-  // Save document - updated for multi-style support
-  // Save document - updated for multi-style support
   // Save document - updated with custom confirm dialog
   const saveDocument = () => {
     // Check if the note is already saved with that name
@@ -138,7 +41,6 @@ const FileOperations = ({
     const documentExists = existingDocuments.includes(documentName);
 
     if (documentExists) {
-
       // New behavior: do not allow overwrite, show error message
       displayMessage(`פתק בשם "${documentName}" כבר שמור במערכת`, 'error');
       setShowSaveDialog(false);
@@ -161,9 +63,6 @@ const FileOperations = ({
       displayMessage('אין פתק פעיל לשמירה', 'error');
       return;
     }
-
-
-
 
     // If the note does not exist, save it directly
     savingProcess();
@@ -207,38 +106,6 @@ const FileOperations = ({
     }
   };
 
-  // Load document - updated for multi-style support
-  // const openDocument = (fileName) => {
-  //   // Check if user is logged in
-  //   if (!isLoggedIn()) {
-  //     displayMessage('עליך להתחבר כדי לפתוח פתקים', 'error');
-  //     setShowOpenDialog(false);
-  //     return;
-  //   }
-
-  //   try {
-  //     const doc = storageService.loadDocument(fileName, currentUser);
-  //     if (doc) {
-  //       // Check if file is in new or old format
-  //       if (doc.textSegments) {
-  //         // New format with multi-style segments
-  //         onOpenDocument(doc.textSegments, doc.defaultStyle, fileName);
-  //       } else {
-  //         // Old format - convert to new format
-  //         onOpenDocument([{ text: doc.content, style: doc.style }], doc.style, fileName);
-  //       }
-
-  //       displayMessage(`הפתק "${fileName}" נטען בהצלחה`, 'success');
-  //       setShowOpenDialog(false);
-  //     } else {
-  //       displayMessage(`לא ניתן לטעון את הפתק "${fileName}"`, 'error');
-  //     }
-  //   } catch (error) {
-  //     displayMessage('שגיאה בטעינת הפתק', 'error');
-  //     console.error('Error loading document:', error);
-  //   }
-  // };
-  // Load document - updated for multi-style support
   // Load document - updated for multi-style support
   const openDocument = (fileName) => {
     // Check if user is logged in
@@ -349,6 +216,12 @@ const FileOperations = ({
     setConfirmAction(null);
   };
 
+  // סגנון לאייקונים
+  const iconStyle = {
+    marginLeft: '5px',
+    fontSize: '16px'
+  };
+
   return (
     <div className="file-operations">
       <div className="file-buttons">
@@ -357,6 +230,7 @@ const FileOperations = ({
           onClick={handleCreateNew}
           title={isLoggedIn() ? "פתק חדש" : "יש להתחבר תחילה"}
         >
+          <i className="fas fa-file-alt" style={iconStyle}></i>
           חדש
         </button>
         <button
@@ -384,6 +258,7 @@ const FileOperations = ({
           }}
           title={isLoggedIn() ? "שמירת פתק" : "יש להתחבר תחילה"}
         >
+          <i className="fas fa-save" style={iconStyle}></i>
           שמור
         </button>
 
@@ -402,6 +277,7 @@ const FileOperations = ({
           }}
           title={isLoggedIn() ? "פתיחת פתק" : "יש להתחבר תחילה"}
         >
+          <i className="fas fa-folder-open" style={iconStyle}></i>
           פתח
         </button>
       </div>
@@ -417,7 +293,10 @@ const FileOperations = ({
       {showSaveDialog && (
         <div className="dialog-overlay">
           <div className="dialog">
-            <h3>שמירת פתק</h3>
+            <h3>
+              <i className="fas fa-save" style={iconStyle}></i>
+              שמירת פתק
+            </h3>
             <input
               type="text"
               value={documentName}
@@ -425,8 +304,14 @@ const FileOperations = ({
               placeholder="שם פתק"
             />
             <div className="dialog-buttons">
-              <button onClick={saveDocument}>שמור</button>
-              <button onClick={() => setShowSaveDialog(false)}>ביטול</button>
+              <button onClick={saveDocument}>
+                <i className="fas fa-check" style={iconStyle}></i>
+                שמור
+              </button>
+              <button onClick={() => setShowSaveDialog(false)}>
+                <i className="fas fa-times" style={iconStyle}></i>
+                ביטול
+              </button>
             </div>
           </div>
         </div>
@@ -436,27 +321,39 @@ const FileOperations = ({
       {showOpenDialog && (
         <div className="dialog-overlay" style={{ zIndex: 9999 }}>
           <div className="dialog documents-dialog" style={{ position: 'relative', maxHeight: '80vh', overflowY: 'auto' }}>
-            <h3>פתיחת פתק</h3>
+            <h3>
+              <i className="fas fa-folder-open" style={iconStyle}></i>
+              פתיחת פתק
+            </h3>
             {documentsList.length > 0 ? (
               <ul className="documents-list">
                 {documentsList.map((fileName) => (
                   <li key={fileName} onClick={() => openDocument(fileName)}>
-                    <span className="document-name">{fileName}</span>
+                    <span className="document-name">
+                      <i className="fas fa-file-alt" style={{marginLeft: '8px'}}></i>
+                      {fileName}
+                    </span>
                     <button
                       className="delete-document-button"
                       onClick={(e) => confirmDeleteDocument(fileName, e)}
                       title="מחק פתק"
                     >
-                      ✕
+                      <i className="fas fa-trash-alt"></i>
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p>אין פתקים שמורים</p>
+              <p>
+                <i className="fas fa-info-circle" style={{marginLeft: '5px'}}></i>
+                אין פתקים שמורים
+              </p>
             )}
             <div className="dialog-buttons">
-              <button onClick={() => setShowOpenDialog(false)}>סגור</button>
+              <button onClick={() => setShowOpenDialog(false)}>
+                <i className="fas fa-times" style={iconStyle}></i>
+                סגור
+              </button>
             </div>
           </div>
         </div>
@@ -466,11 +363,20 @@ const FileOperations = ({
       {showConfirmDialog && (
         <div className="dialog-overlay" style={{ zIndex: 99999 }}>
           <div className="dialog">
-            <h3>אישור פעולה</h3>
+            <h3>
+              <i className="fas fa-exclamation-triangle" style={{marginLeft: '5px', color: '#e74c3c'}}></i>
+              אישור פעולה
+            </h3>
             <p>{confirmMessage}</p>
             <div className="dialog-buttons">
-              <button onClick={handleConfirm}>אישור</button>
-              <button onClick={handleCancel}>ביטול</button>
+              <button onClick={handleConfirm}>
+                <i className="fas fa-check" style={iconStyle}></i>
+                אישור
+              </button>
+              <button onClick={handleCancel}>
+                <i className="fas fa-times" style={iconStyle}></i>
+                ביטול
+              </button>
             </div>
           </div>
         </div>

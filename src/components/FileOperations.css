@@ -1,14 +1,12 @@
-/* FileOperations.css - קובץ מלא עם הודעות בחלק העליון */
 
 .file-operations {
   position: relative;
   padding: 10px 15px;
-  /* backdrop-filter: blur(3px); */
   border-bottom: none;
   display: flex;
-  justify-content: flex-start; /* שינוי מ-flex-end ל-flex-start */
+  justify-content: flex-start; 
   margin-bottom: 3px;
-  z-index: 500; /* z-index נמוך יותר מהדיאלוגים */
+  z-index: 500; 
 }
 
 .file-buttons {
@@ -81,7 +79,7 @@
   color: #8B4513;
   border-right: 3px solid #8B4513;
 }
-/* הוספת אייקון לפני ההודעה */
+
 .file-message.success:before {
   content: "📄 ";
   margin-left: 5px;
@@ -92,7 +90,6 @@
   margin-left: 5px;
 }
 
-/* תיקון מקיף לכל חלוניות הדיאלוג */
 .dialog-overlay {
   position: fixed;
   top: 0;
@@ -119,9 +116,7 @@
   margin: auto !important;
   max-height: 80vh !important;
   overflow-y: auto;
-  /* מנע הזזה אוטומטית של הדיאלוג למעלה */
   transform: translate(0, 0) !important;
-  /* תוספות מקצועיות */
   border: 1px solid rgba(94, 76, 58, 0.1);
   transition: all 0.3s;
   direction: rtl;
@@ -182,7 +177,6 @@
   background-color: var(--beige-medium);
 }
 
-/* דיאלוג מסמכים */
 .documents-dialog {
   width: 380px;
   max-height: 450px;
@@ -243,7 +237,6 @@
   transform: rotate(90deg);
 }
 
-/* תיקונים למסכים קטנים */
 @media (max-height: 600px) {
   .dialog {
     max-height: 90vh !important;

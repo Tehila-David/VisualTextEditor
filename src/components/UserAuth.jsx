@@ -108,12 +108,28 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
     setPassword('');
   };
 
+  // סגנון לאייקונים
+  const iconStyle = {
+    marginLeft: '5px',
+    fontSize: '16px'
+  };
+
+  // סגנון לאייקונים גדולים יותר
+  const largeIconStyle = {
+    marginLeft: '5px',
+    fontSize: '18px'
+  };
+
   return (
     <div className="user-auth">
       {currentUser ? (
         <div className="user-info">
-          <span className="welcome-message">שלום, {currentUser}</span>
+          <span className="welcome-message">
+            <i className="fas fa-user" style={largeIconStyle}></i>
+            שלום, {currentUser}
+          </span>
           <button className="auth-button logout-button" onClick={confirmLogout}>
+            <i className="fas fa-sign-out-alt" style={iconStyle}></i>
             התנתק
           </button>
         </div>
@@ -123,12 +139,14 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
             className="auth-button" 
             onClick={openLoginDialog}
           >
+            <i className="fas fa-sign-in-alt" style={iconStyle}></i>
             התחבר
           </button>
           <button 
             className="auth-button" 
             onClick={openRegisterDialog}
           >
+            <i className="fas fa-user-plus" style={iconStyle}></i>
             הרשם
           </button>
         </div>
@@ -145,10 +163,16 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
       {showLogin && (
         <div className="auth-dialog-overlay">
           <div className="auth-dialog">
-            <h3>התחברות</h3>
+            <h3>
+              <i className="fas fa-sign-in-alt" style={largeIconStyle}></i>
+              התחברות
+            </h3>
             <form onSubmit={handleLogin}>
               <div className="form-group">
-                <label>שם משתמש</label>
+                <label>
+                  <i className="fas fa-user" style={iconStyle}></i>
+                  שם משתמש
+                </label>
                 <input 
                   type="text" 
                   value={username} 
@@ -156,7 +180,10 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
                 />
               </div>
               <div className="form-group">
-                <label>סיסמה</label>
+                <label>
+                  <i className="fas fa-lock" style={iconStyle}></i>
+                  סיסמה
+                </label>
                 <input 
                   type="password" 
                   value={password} 
@@ -164,11 +191,15 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
                 />
               </div>
               <div className="auth-dialog-buttons">
-                <button type="submit">התחבר</button>
+                <button type="submit">
+                  <i className="fas fa-check" style={iconStyle}></i>
+                  התחבר
+                </button>
                 <button 
                   type="button" 
                   onClick={() => setShowLogin(false)}
                 >
+                  <i className="fas fa-times" style={iconStyle}></i>
                   ביטול
                 </button>
               </div>
@@ -181,10 +212,16 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
       {showRegister && (
         <div className="auth-dialog-overlay">
           <div className="auth-dialog">
-            <h3>הרשמה</h3>
+            <h3>
+              <i className="fas fa-user-plus" style={largeIconStyle}></i>
+              הרשמה
+            </h3>
             <form onSubmit={handleRegister}>
               <div className="form-group">
-                <label>שם משתמש</label>
+                <label>
+                  <i className="fas fa-user" style={iconStyle}></i>
+                  שם משתמש
+                </label>
                 <input 
                   type="text" 
                   value={username} 
@@ -192,7 +229,10 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
                 />
               </div>
               <div className="form-group">
-                <label>סיסמה</label>
+                <label>
+                  <i className="fas fa-lock" style={iconStyle}></i>
+                  סיסמה
+                </label>
                 <input 
                   type="password" 
                   value={password} 
@@ -200,11 +240,15 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
                 />
               </div>
               <div className="auth-dialog-buttons">
-                <button type="submit">הרשם</button>
+                <button type="submit">
+                  <i className="fas fa-check" style={iconStyle}></i>
+                  הרשם
+                </button>
                 <button 
                   type="button" 
                   onClick={() => setShowRegister(false)}
                 >
+                  <i className="fas fa-times" style={iconStyle}></i>
                   ביטול
                 </button>
               </div>
@@ -217,11 +261,23 @@ const UserAuth = ({ onUserLogin, onUserLogout, currentUser, showMessage }) => {
       {showConfirmLogout && (
         <div className="auth-dialog-overlay">
           <div className="auth-dialog">
-            <h3>אישור התנתקות</h3>
-            <p>האם אתה בטוח שברצונך להתנתק? כל המסמכים הפתוחים ייסגרו.</p>
+            <h3>
+              <i className="fas fa-exclamation-triangle" style={{marginLeft: '5px', color: '#e74c3c'}}></i>
+              אישור התנתקות
+            </h3>
+            <p>
+              <i className="fas fa-info-circle" style={{marginLeft: '5px', color: '#3498db'}}></i>
+              האם אתה בטוח שברצונך להתנתק? כל המסמכים הפתוחים ייסגרו.
+            </p>
             <div className="auth-dialog-buttons">
-              <button onClick={handleLogout}>אישור</button>
-              <button onClick={() => setShowConfirmLogout(false)}>ביטול</button>
+              <button onClick={handleLogout}>
+                <i className="fas fa-check" style={iconStyle}></i>
+                אישור
+              </button>
+              <button onClick={() => setShowConfirmLogout(false)}>
+                <i className="fas fa-times" style={iconStyle}></i>
+                ביטול
+              </button>
             </div>
           </div>
         </div>

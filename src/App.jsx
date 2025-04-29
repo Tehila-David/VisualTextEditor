@@ -256,160 +256,6 @@ function App() {
   };
 
   // Function to add a character
-  // const addCharacter = (char) => {
-  //   if (activeDocumentIndex >= 0) {
-  //     // Validate that the character is valid
-  //     if (char === undefined || char === null) {
-  //       console.error("Character is undefined or null");
-  //       return;
-  //     }
-
-  //     // Ensure the character is a string
-  //     const charToAdd = char;
-  //     const isEmoji = emojiRegex().test(charToAdd);
-  //     const newDocuments = [...documents];
-  //     const currentDoc = JSON.parse(JSON.stringify(newDocuments[activeDocumentIndex])); // Deep copy
-
-  //     // Make sure text segments exist
-  //     if (!currentDoc.textSegments) {
-  //       currentDoc.textSegments = [];
-  //     }
-
-  //     if (isEmoji) {
-  //       currentDoc.textSegments.push({
-  //         text: charToAdd,
-  //         style: { ...currentStyle }
-  //       });
-  //       currentDoc.fullContent = charToAdd;
-
-  //       newDocuments[activeDocumentIndex] = currentDoc;
-  //       setDocuments(newDocuments);
-  //       setCursorPosition(cursorPosition + charToAdd.length);
-  //       return;
-
-  //     }
-
-  //     if (currentDoc.textSegments.length === 0) {
-  //       // If no text segments exist, create a new one
-  //       currentDoc.textSegments.push({
-  //         text: charToAdd,
-  //         style: { ...currentStyle }
-  //       });
-  //       currentDoc.fullContent = charToAdd;
-
-  //       newDocuments[activeDocumentIndex] = currentDoc;
-  //       setDocuments(newDocuments);
-  //       setCursorPosition(1);
-  //       return;
-  //     }
-
-
-  //     // Find the segment and relative position
-  //     const { segmentIndex, localPosition } = findSegmentAndPosition(currentDoc, cursorPosition);
-
-  //     if (applyStyleFromNow) {
-  //       // "Apply from now on" mode - check whether to create a new segment or split the existing one
-
-  //       if (segmentIndex >= 0 && localPosition === currentDoc.textSegments[segmentIndex].text.length) {
-  //         // Cursor is at the end of an existing segment, check if styles match
-  //         const currentSegment = currentDoc.textSegments[segmentIndex];
-  //         const isSameStyle = JSON.stringify(currentSegment.style) === JSON.stringify(currentStyle);
-
-  //         if (isSameStyle) {
-  //           // If style matches, add character to the current segment
-  //           currentSegment.text += charToAdd;
-  //         } else {
-  //           // If style is different, create a new segment
-  //           currentDoc.textSegments.splice(segmentIndex + 1, 0, {
-  //             text: charToAdd,
-  //             style: { ...currentStyle }
-  //           });
-  //         }
-  //       } else if (segmentIndex >= 0) {
-  //         // Cursor is inside an existing segment, need to split it
-  //         const currentSegment = currentDoc.textSegments[segmentIndex];
-  //         const beforeText = currentSegment.text.substring(0, localPosition);
-  //         const afterText = currentSegment.text.substring(localPosition);
-
-  //         // Update the current segment with the text before the cursor
-  //         currentSegment.text = beforeText;
-
-  //         // Insert a new segment with the new character
-  //         currentDoc.textSegments.splice(segmentIndex + 1, 0, {
-  //           text: charToAdd,
-  //           style: { ...currentStyle }
-  //         });
-
-  //         // Insert another segment with the remaining text (if any)
-  //         if (afterText) {
-  //           currentDoc.textSegments.splice(segmentIndex + 2, 0, {
-  //             text: afterText,
-  //             style: { ...currentSegment.style }
-  //           });
-  //         }
-  //       } else {
-  //         // No appropriate segment found, create a new one
-  //         currentDoc.textSegments.push({
-  //           text: charToAdd,
-  //           style: { ...currentStyle }
-  //         });
-  //       }
-  //     } else {
-  //       // "All text" mode - apply a unified style to the whole document
-
-  //       if (currentDoc.textSegments.length === 1) {
-  //         // Only one segment exists, update it
-  //         const segment = currentDoc.textSegments[0];
-
-  //         const beforeText = segment.text.substring(0, localPosition);
-  //         const afterText = segment.text.substring(localPosition);
-
-  //         // Update the segment with the added character
-  //         segment.text = beforeText + charToAdd + afterText;
-  //         segment.style = { ...currentStyle };
-  //       } else {
-  //         // Multiple segments exist, merge them into one
-  //         const fullText = currentDoc.fullContent;
-  //         const beforeText = fullText.substring(0, cursorPosition);
-  //         const afterText = fullText.substring(cursorPosition);
-
-  //         // Replace all segments with a single one
-  //         currentDoc.textSegments = [{
-  //           text: beforeText + charToAdd + afterText,
-  //           style: { ...currentStyle }
-  //         }];
-  //       }
-  //     }
-
-  //     // Update the full content
-  //     currentDoc.fullContent = currentDoc.textSegments.reduce((acc, segment) => acc + segment.text, '');
-
-  //     newDocuments[activeDocumentIndex] = currentDoc;
-  //     setDocuments(newDocuments);
-  //     setCursorPosition(cursorPosition + 1);
-
-  //     // Save in history (optional to improve performance)
-  //     if (historyIndex >= 0 && history.length > 0) {
-  //       const lastHistory = history[historyIndex];
-  //       // Save to history only if there is a significant change
-  //       if (lastHistory.fullContent.length + 5 < currentDoc.fullContent.length) {
-  //         const newHistory = [...history.slice(0, historyIndex + 1)];
-  //         newHistory.push(JSON.parse(JSON.stringify(currentDoc))); // Deep copy
-  //         setHistory(newHistory);
-  //         setHistoryIndex(newHistory.length - 1);
-  //       }
-  //     }
-  //   } else if (documents.length === 0) {
-  //     // If there are no documents and the user is connected, create a new document
-  //     if (currentUser && currentUser !== 'default') {
-  //       createNewDocument();
-  //       // Retry after creating a new document
-  //       setTimeout(() => addCharacter(char), 10);
-  //     } else {
-  //       showMessage('You must be logged in to create a new note.', 'error');
-  //     }
-  //   }
-  // };
   const addCharacter = (char) => {
     if (activeDocumentIndex >= 0) {
       // וידוא שהמצב ההתחלתי (ריק) נשמר אם זו הפעולה הראשונה
@@ -926,7 +772,7 @@ function App() {
           beforeDelete = beforeDelete.substring(0, beforeDelete.length);
         } else {
           // Otherwise, delete just 1 character (regular char)
-          beforeDelete = beforeDelete.substring(0, beforeDelete.length-1);
+          beforeDelete = beforeDelete.substring(0, beforeDelete.length - 1);
           console.log("delete: " + prevChar);
         }
         if (beforeDelete.length === 0 && afterDelete.length === 0) {
@@ -1265,34 +1111,34 @@ function App() {
   const searchText = (searchTerm) => {
     if (activeDocumentIndex >= 0 && searchTerm) {
       const currentDoc = documents[activeDocumentIndex];
-      
+
       // מציאת כל המופעים של מילת החיפוש
       const positions = [];
       let position = -1;
       let currentPosition = 0;
-      
+
       // לולאה שמוצאת את כל המופעים
       while (true) {
         position = currentDoc.fullContent.indexOf(searchTerm, currentPosition);
-        
+
         if (position === -1) {
           // לא נמצאו עוד מופעים
           break;
         }
-        
+
         // נמצא מופע - הוספתו לרשימה והתקדמות לחיפוש הבא
         positions.push(position);
         currentPosition = position + searchTerm.length;
       }
-      
+
       if (positions.length > 0) {
         // נמצאו מופעים - יצירת הודעה עם כל המיקומים
         const positionsText = positions.join(', ');
         showMessage(`הטקסט "${searchTerm}" נמצא ב-${positions.length} מקומות. מיקומים: ${positionsText}`, 'success');
-        
+
         // אופציונלי: קביעת הסמן למיקום הראשון שנמצא
         // setCursorPosition(positions[0] + searchTerm.length);
-        
+
         return positions;
       } else {
         showMessage(`הטקסט "${searchTerm}" לא נמצא במסמך`, 'error');
@@ -1666,9 +1512,17 @@ function App() {
       {/* רכיב להצגת הודעות המערכת */}
       {appMessage && (
         <div className={`app-message ${appMessageType}`}>
+          <i
+            className={
+              appMessageType === 'success'
+                ? 'fas fa-check-circle icon-success'
+                : 'fas fa-exclamation-triangle icon-error'
+            }
+          ></i>
           {appMessage}
         </div>
       )}
+
       {showConfirmClearText && (
         <div className="auth-dialog-overlay">
           <div className="auth-dialog">

@@ -164,22 +164,39 @@ const Keyboard = ({
     // Ensure emojis are handled correctly
     if (currentLanguage === 'emoji') {
       // Use setTimeout to work around asynchronous state update issues
-
       onAddCharacter(charToAdd);
-
     } else {
       // For regular characters
       onAddCharacter(charToAdd);
     }
   };
 
+  // סגנון אחיד לכל האייקונים
+  const iconStyle = {
+    marginLeft: '5px',
+    fontSize: '10px' // גודל האייקון הגדול יותר
+  };
+
+  // סגנונות ספציפיים לאייקוני הסגנון
+  const styleIconStyle = {
+    fontSize: '12px' // אייקוני סגנון עם גודל זהה
+  };
+
+  // סגנון לאייקוני כפתורים
+  const buttonIconStyle = {
+    marginLeft: '7px',
+    fontSize: '14px' // אייקונים גדולים יותר בכפתורים
+  };
 
   return (
     <div className="keyboard-main">
       {/* Right sidebar - Styling options */}
       <div className="right-sidebar">
         <div className="style-section">
-          <div className="section-title">גופן</div>
+          <div className="section-title">
+            <i className="fas fa-font" style={{...iconStyle, fontSize: '10px'}}></i>
+            גופן
+          </div>
           <div className="control-row">
             <select
               className="select-control"
@@ -194,7 +211,10 @@ const Keyboard = ({
         </div>
 
         <div className="style-section">
-          <div className="section-title">גודל</div>
+          <div className="section-title">
+            <i className="fas fa-text-height" style={{...iconStyle, fontSize: '10px'}}></i>
+            גודל
+          </div>
           <div className="control-row">
             <select
               className="select-control"
@@ -209,7 +229,10 @@ const Keyboard = ({
         </div>
 
         <div className="style-section">
-          <div className="section-title">צבע</div>
+          <div className="section-title">
+            <i className="fas fa-palette" style={{...iconStyle, fontSize: '10px', color: selectedColor}}></i>
+            צבע
+          </div>
           <div className="control-row">
             <select
               className="select-control"
@@ -217,7 +240,7 @@ const Keyboard = ({
               onChange={e => handleColorChange(e.target.value)}
             >
               {colors.map(color => (
-                <option key={color.value} value={color.value} style={{ backgroundColor: color.value }}>
+                <option key={color.value} value={color.value} style={{ backgroundColor: color.value, color: color.value === '#000000' ? '#ffffff' : '#000000' }}>
                   {color.label}
                 </option>
               ))}
@@ -233,21 +256,21 @@ const Keyboard = ({
               onClick={toggleBold}
               aria-label="Bold"
             >
-              <strong>B</strong>
+              <i className="fas fa-bold" style={styleIconStyle}></i>
             </button>
             <button
               className={`style-button ${italicActive ? 'active' : ''}`}
               onClick={toggleItalic}
               aria-label="Italic"
             >
-              <i>I</i>
+              <i className="fas fa-italic" style={styleIconStyle}></i>
             </button>
             <button
               className={`style-button ${underlineActive ? 'active' : ''}`}
               onClick={toggleUnderline}
               aria-label="Underline"
             >
-              <u>U</u>
+              <i className="fas fa-underline" style={styleIconStyle}></i>
             </button>
 
             {/* Style scope buttons (Same row as Style buttons) */}
@@ -256,6 +279,7 @@ const Keyboard = ({
               onClick={() => setStyleScope(false)}
               title="העיצוב יחול על כל הטקסט"
             >
+              <i className="fas fa-align-justify" style={buttonIconStyle}></i>
               כל הטקסט
             </button>
             <button
@@ -263,6 +287,7 @@ const Keyboard = ({
               onClick={() => setStyleScope(true)}
               title="העיצוב יחול רק על טקסט חדש"
             >
+              <i className="fas fa-long-arrow-alt-right" style={buttonIconStyle}></i>
               מכאן והלאה
             </button>
           </div>
@@ -271,7 +296,10 @@ const Keyboard = ({
       {/* Keyboard area */}
       <div className="keyboard-wrapper">
         <div className="keyboard">
-          <div className="section-title">המקלדת שלי</div>
+          <div className="section-title">
+            <i className="fas fa-keyboard" style={{...iconStyle, fontSize: '14px'}}></i>
+            המקלדת שלי
+          </div>
           {currentLayout.map((row, rowIndex) => (
             <div key={`row-${rowIndex}`} className="keyboard-row">
               {row.map((key, keyIndex) => (
@@ -292,6 +320,7 @@ const Keyboard = ({
               onClick={onDeleteCharacter}
               aria-label="מחק תו"
             >
+              <i className="fas fa-backspace" style={{...buttonIconStyle, fontSize: '18px'}}></i>
               מחק
             </button>
             <button
@@ -313,24 +342,28 @@ const Keyboard = ({
             className="action-button delete-word"
             onClick={onDeleteWord}
           >
+            <i className="fas fa-eraser" style={buttonIconStyle}></i>
             מחק מילה
           </button>
           <button
             className="action-button clear-all"
             onClick={onClearText}
           >
+            <i className="fas fa-trash" style={buttonIconStyle}></i>
             נקה הכל
           </button>
           <button
             className="action-button undo"
             onClick={onUndo}
           >
+            <i className="fas fa-undo" style={buttonIconStyle}></i>
             ביטול
           </button>
           <button
             className="action-button advanced"
             onClick={() => setShowAdvanced(!showAdvanced)}
           >
+            <i className="fas fa-cog" style={buttonIconStyle}></i>
             {showAdvanced ? 'הסתר פעולות מתקדמות' : 'פעולות מתקדמות'}
           </button>
 
@@ -338,11 +371,17 @@ const Keyboard = ({
           {showAdvanced && (
             <div className="advanced-popup">
               <div className="popup-header">
-                <div className="popup-title">פעולות מתקדמות</div>
+                <div className="popup-title">
+                  <i className="fas fa-cog" style={iconStyle}></i>
+                  פעולות מתקדמות
+                </div>
               </div>
               <div className="popup-content">
                 <div className="advanced-group">
-                  <label>חיפוש:</label>
+                  <label>
+                    <i className="fas fa-search" style={iconStyle}></i>
+                    חיפוש:
+                  </label>
                   <div className="input-action">
                     <input
                       type="text"
@@ -350,12 +389,18 @@ const Keyboard = ({
                       onChange={(e) => setSearchText(e.target.value)}
                       placeholder="הקלד טקסט לחיפוש"
                     />
-                    <button onClick={handleSearch}>חפש</button>
+                    <button onClick={handleSearch}>
+                      <i className="fas fa-search" style={iconStyle}></i>
+                      חפש
+                    </button>
                   </div>
                 </div>
 
                 <div className="advanced-group">
-                  <label>החלפה:</label>
+                  <label>
+                    <i className="fas fa-exchange-alt" style={iconStyle}></i>
+                    החלפה:
+                  </label>
                   <div className="input-action">
                     <input
                       type="text"
@@ -363,34 +408,32 @@ const Keyboard = ({
                       onChange={(e) => setReplaceText(e.target.value)}
                       placeholder="הקלד טקסט להחלפה"
                     />
-                    <button onClick={handleReplace}>החלף</button>
+                    <button onClick={handleReplace}>
+                      <i className="fas fa-exchange-alt" style={iconStyle}></i>
+                      החלף
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
           )}
         </div>
-
         <div className="action-section">
-          <div className="section-title">שפה</div>
-          <button
-            className={`language-button ${currentLanguage === 'hebrew' ? 'active' : ''}`}
-            onClick={() => onLanguageChange('hebrew')}
-          >
-            עברית
-          </button>
-          <button
-            className={`language-button ${currentLanguage === 'english' ? 'active' : ''}`}
-            onClick={() => onLanguageChange('english')}
-          >
-            English
-          </button>
-          <button
-            className={`language-button ${currentLanguage === 'emoji' ? 'active' : ''}`}
-            onClick={() => onLanguageChange('emoji')}
-          >
-            אימוג'י
-          </button>
+          <div className="section-title">
+            <i className="fas fa-globe" style={{...iconStyle, fontSize: '15px'}}></i>
+            שפה
+          </div>
+          <div className="control-row">
+            <select
+              className="select-control"
+              value={currentLanguage}
+              onChange={(e) => onLanguageChange(e.target.value)}
+            >
+              <option value="hebrew">עברית</option>
+              <option value="english">English</option>
+              <option value="emoji">אימוג'י</option>
+            </select>
+          </div>
         </div>
       </div>
     </div>
