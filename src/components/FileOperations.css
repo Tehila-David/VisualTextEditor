@@ -12,7 +12,7 @@
 .file-buttons {
   display: flex;
   gap: 8px;
-  margin-right: auto; /* העברת הכפתורים לצד ימין */
+  margin-right: auto; 
   margin-right: 0;
 }
 
@@ -40,7 +40,6 @@
 }
 
 
-/* עיצוב הודעות הבזק בחלק העליון של המסך */
 .flash-message {
   position: fixed;
   top: 10px;
@@ -97,12 +96,12 @@
   right: 0;
   bottom: 0;
   background-color: rgba(35, 34, 33, 0.5);
-  display: flex !important; /* שימוש ב-!important להתגבר על הגדרות אחרות */
+  display: flex !important;
   align-items: center !important;
   justify-content: center !important;
-  z-index: 99999; /* ערך גבוה יותר */
+  z-index: 99999; 
   backdrop-filter: blur(3px);
-  transition: all 0.3s; /* אנימציה חלקה */
+  transition: all 0.3s; 
 }
 
 

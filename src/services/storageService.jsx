@@ -1,13 +1,13 @@
-// שירות לניהול אחסון מקומי (Local Storage) - מעודכן לתמיכה באימוג'ים
+// Local Storage management service - updated to support emojis
 
 const STORAGE_PREFIX = 'visual-text-editor-';
 
 const storageService = {
-  // שמירת מסמך - מעודכן לתמיכה באימוג'ים
+  // Save document - updated to support emojis
   saveDocument: (fileName, documentData, userId = 'default') => {
     const documentKey = `${STORAGE_PREFIX}${userId}-${fileName}`;
     
-    // וידוא שיש לנו מבנה נתונים תקין
+    // Ensure we have a valid data structure
     const dataToSave = {
       textSegments: documentData.textSegments || [],
       fullContent: documentData.fullContent || '',
@@ -17,10 +17,10 @@ const storageService = {
     };
     
     try {
-      // שימוש בקידוד מיוחד לטיפול באימוג'ים
+      // Use special encoding to handle emojis
       localStorage.setItem(documentKey, JSON.stringify(dataToSave));
       
-      // עדכון רשימת המסמכים של המשתמש
+      // Update the user's document list
       const userDocuments = storageService.getUserDocumentsList(userId);
       if (!userDocuments.includes(fileName)) {
         userDocuments.push(fileName);
@@ -31,9 +31,9 @@ const storageService = {
     } catch (error) {
       console.error('Error saving document with emojis:', error);
       
-      // אם יש שגיאה, ננסה לשמור ללא תווים מיוחדים (כתחליף)
+      // If there's an error, try to save without special characters (as fallback)
       try {
-        // ניסיון לשמור ללא אימוג'ים
+        // Attempt to save without emojis
         const safeData = JSON.parse(JSON.stringify(dataToSave));
         localStorage.setItem(documentKey, JSON.stringify(safeData));
         return true;
@@ -44,7 +44,7 @@ const storageService = {
     }
   },
   
-  // טעינת מסמך - מעודכן לתמיכה באימוג'ים
+  // Load document - updated to support emojis
   loadDocument: (fileName, userId = 'default') => {
     const documentKey = `${STORAGE_PREFIX}${userId}-${fileName}`;
     try {
@@ -56,9 +56,9 @@ const storageService = {
       
       const parsedData = JSON.parse(documentData);
       
-      // בדיקה אם זה מסמך ישן (לפני עדכון לסגנונות מרובים)
+      // Check if this is an old document (before update to multiple styles)
       if (!parsedData.textSegments && parsedData.content) {
-        // המרה למבנה החדש
+        // Convert to new structure
         return {
           textSegments: [{ 
             text: parsedData.content, 
@@ -78,12 +78,12 @@ const storageService = {
     }
   },
   
-  // מחיקת מסמך
+  // Delete document
   deleteDocument: (fileName, userId = 'default') => {
     const documentKey = `${STORAGE_PREFIX}${userId}-${fileName}`;
     localStorage.removeItem(documentKey);
     
-    // עדכון רשימת המסמכים של המשתמש
+    // Update the user's document list
     const userDocuments = storageService.getUserDocumentsList(userId);
     const updatedList = userDocuments.filter(name => name !== fileName);
     storageService.saveUserDocumentsList(userId, updatedList);
@@ -91,7 +91,7 @@ const storageService = {
     return true;
   },
   
-  // קבלת רשימת מסמכים של משתמש
+  // Get user's document list
   getUserDocumentsList: (userId = 'default') => {
     const listKey = `${STORAGE_PREFIX}${userId}-documents`;
     const documentsList = localStorage.getItem(listKey);
@@ -103,26 +103,26 @@ const storageService = {
     return JSON.parse(documentsList);
   },
   
-  // שמירת רשימת מסמכים של משתמש
+  // Save user's document list
   saveUserDocumentsList: (userId, documentsList) => {
     const listKey = `${STORAGE_PREFIX}${userId}-documents`;
     localStorage.setItem(listKey, JSON.stringify(documentsList));
     return true;
   },
   
-  // רישום משתמש חדש
+  // Register new user
   registerUser: (username, password) => {
     const usersKey = `${STORAGE_PREFIX}users`;
     let users = storageService.getUsers();
     
-    // בדיקה אם המשתמש כבר קיים
+    // Check if user already exists
     if (users.find(user => user.username === username)) {
       return false;
     }
     
     users.push({
       username,
-      password, // במקרה אמיתי, יש להצפין את הסיסמה!
+      password, // In a real scenario, the password should be encrypted!
       createdAt: new Date().toISOString()
     });
     
@@ -130,7 +130,7 @@ const storageService = {
     return true;
   },
   
-  // התחברות משתמש
+  // User login
   loginUser: (username, password) => {
     const users = storageService.getUsers();
     const user = users.find(user => user.username === username && user.password === password);
@@ -138,7 +138,7 @@ const storageService = {
     return user ? username : null;
   },
   
-  // קבלת רשימת משתמשים
+  // Get users list
   getUsers: () => {
     const usersKey = `${STORAGE_PREFIX}users`;
     const users = localStorage.getItem(usersKey);

@@ -24,11 +24,140 @@ textarea:focus {
   outline: none;
 }
 
-/* מתאים עבור אפליקציה דו-כיוונית (עברית ואנגלית) */
 [dir="ltr"] {
   text-align: left;
 }
 
 [dir="rtl"] {
   text-align: right;
+}
+
+:root {
+  
+  --beige-light: #e8e3d7;    
+  --beige-medium: #d9d0c0;
+  --beige-dark: #c2b9a7;   
+  --green-light: #d1dac7;  
+  --pink-light: #f0d8d2;     
+  --brown-light: #a28e76;  
+  --brown-medium: #8a755a;   
+  --brown-dark: #5e4c3a;    
+  --black: #232221;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 18px;
+}
+
+html, body {
+  background-image: url('/src/background.png');
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-y: auto; 
+  font-family: 'Arial', sans-serif;
+}
+
+
+
+#root {
+  height: 100%;
+}
+
+
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh; 
+  box-sizing: border-box;
+  overflow-y: auto;
+}
+
+
+.text-display-container {
+  flex: 1;
+  background-color: rgba(209, 218, 199, 0.2);
+  border-radius: var(--radius-md);
+  margin: 5px;
+  padding: 10px;
+  overflow-y: auto;
+  box-shadow: 0 2px 10px rgba(94, 76, 58, 0.08);
+}
+
+
+.editor-container {
+  height: 250px; 
+  min-height: 0;
+  max-height: none;  
+  margin: 5px;
+  margin-top: 0;
+  position: relative;
+  overflow-y: auto;
+  background-color: transparent;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+@media (max-height: 700px) {
+  .editor-container {
+    height: 280px;
+  }
+}
+
+@media (max-height: 600px) {
+  .editor-container {
+    height: 240px;
+  }
+}
+.app-message {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px 20px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+  z-index: 9999;
+  animation: fadeInOut 3s ease;
+  min-width: 300px;
+  text-align: center;
+  direction: rtl;
+}
+.icon-success,
+.icon-error {
+  margin-inline-end: 8px; 
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translate(-50%, -20px); }
+  10% { opacity: 1; transform: translate(-50%, 0); }
+  90% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -20px); }
+}
+
+.app-message.success {
+  background-color: rgba(209, 218, 199, 0.9);
+  color: var(--brown-dark);
+  border-right: 3px solid var(--brown-medium);
+}
+
+.app-message.error {
+  background-color: rgba(195, 142, 142, 0.9);
+  color: #fff;
+  border-right: 3px solid #8B4513;
+}
+
+.confirm-dialog {
+  width: 350px;
+  text-align: center;
+}
+
+.confirm-dialog p {
+  margin: 15px 0;
+  font-size: 15px;
+  color: var(--brown-dark);
+  line-height: 1.4;
 }

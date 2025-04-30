@@ -9,7 +9,8 @@ const MultiTextDisplay = ({
   cursorPosition,
   applyStyleFromNow,
   currentStyle,
-  onCursorChange
+  onCursorChange,
+  resetHistory // Add this prop to receive the resetHistory function
 }) => {
   // Helper function to find segment index and relative position
   const findSegmentAndPosition = (doc, position) => {
@@ -31,6 +32,18 @@ const MultiTextDisplay = ({
       segmentIndex: doc.textSegments.length - 1,
       localPosition: doc.textSegments.length > 0 ? doc.textSegments[doc.textSegments.length - 1].text.length : 0
     };
+  };
+
+  // Helper function to handle document selection with history reset
+  const handleDocumentSelect = (index) => {
+    // First reset history
+    if (resetHistory) {
+      resetHistory();
+      console.log('History reset when selecting document:', index);
+    }
+    
+    // Then call the original onDocumentSelect
+    onDocumentSelect(index);
   };
 
   // Helper function to render document content with multi-style segments
@@ -88,48 +101,30 @@ const MultiTextDisplay = ({
     );
   };
 
-  // Handler for mouse clicks to update cursor position
-  // const handleDocumentClick = (event, index) => {
-  //   if (index === activeDocumentIndex && onCursorChange) {
-  //     const element = event.currentTarget.querySelector('.document-content');
-  //     if (!element) return;
-      
-  //     const doc = documents[index];
-  //     if (!doc.textSegments || doc.textSegments.length === 0) {
-  //       onCursorChange(0);
-  //       return;
-  //     }
-      
-  //     // Simple calculation - get relative percentage of click position
-  //     // and convert to relative position in text
-  //     const rect = element.getBoundingClientRect();
-  //     const relativeX = event.clientX - rect.left;
-  //     const percentage = relativeX / rect.width;
-      
-  //     const totalLength = doc.fullContent.length;
-  //     let estimatedPosition = Math.floor(percentage * totalLength);
-      
-  //     // Ensure position is within bounds
-  //     estimatedPosition = Math.min(Math.max(0, estimatedPosition), totalLength);
-      
-  //     onCursorChange(estimatedPosition);
-  //   }
-  // };
-
+  // Handle document click for cursor placement
+  const handleDocumentClick = (e, docIndex) => {
+    // This function would handle cursor placement when clicking on a document
+    // It's not implemented in the current code, but would be used if you want to add this feature
+    if (onCursorChange && docIndex === activeDocumentIndex) {
+      // Implementation would depend on how you want to handle cursor placement
+    }
+  };
+  
   return (
     <div className="multi-text-display">
       {documents.length === 0 ? (
         <div className="empty-state">
-          <p>אין פתקים פתוחים. צור או פתח פתק כדי להתחיל לעבוד.</p>
+         <p>אין פתקים פתוחים.</p>
         </div>
       ) : (
         <div className="documents-container">
           {documents.map((doc, index) => (
             <div 
-            key={`${index}-${doc.fullContent.length}`}
+              key={`${index}-${doc.fullContent.length}`}
               className={`document-wrapper ${index === activeDocumentIndex ? 'active' : ''}`}
               onClick={(e) => {
-                onDocumentSelect(index);
+                // Use handleDocumentSelect to reset history before selecting document
+                handleDocumentSelect(index);
                 if (index === activeDocumentIndex) {
                   handleDocumentClick(e, index);
                 }
@@ -167,4 +162,4 @@ const MultiTextDisplay = ({
   );
 };
 
-export default MultiTextDisplay;
+export default MultiTextDisplay;f
