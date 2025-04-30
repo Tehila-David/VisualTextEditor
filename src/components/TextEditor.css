@@ -1,13 +1,11 @@
-/* TextEditor.css - מעודכן */
 .text-editor-container {
   display: flex;
   flex-direction: column;
   width: 100%;
   height: 100%;
-  overflow: visible; /* חשוב! מונע חיתוך */
+  overflow: visible; 
 }
 
-/* במידה ונרצה לתת סגנון למיכל של המקלדת */
 .text-editor {
   display: flex;
   flex-direction: column;

@@ -668,7 +668,6 @@ function App() {
     }
   };
 
-
   // Function to clear text
   const clearText = () => {
     if (activeDocumentIndex >= 0) {
@@ -1137,7 +1136,7 @@ function App() {
     setActiveDocumentIndex(-1);
     // The document list is already empty, no need to create a new document here
   };
-  // הוסף פונקציה זו ב-App.jsx
+
   const resetHistory = () => {
     setHistory([]);
     setHistoryIndex(-1);

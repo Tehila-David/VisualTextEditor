@@ -58,24 +58,21 @@
 
 .user-info {
   display: flex;
-  justify-content: space-between; /* יוצר מרווח מקסימלי בין האלמנטים */
+  justify-content: space-between; 
   align-items: center;
-  width: 100%; /* מרחיב את האזור לרוחב מלא */
+  width: 100%; 
 }
 
 .welcome-message {
   font-weight: 600;
   color: var(--brown-dark);
   font-size: 20px;
-  /* ללא margin כדי שיישאר בצד ימין */
 }
 
 .logout-button {
   background-color: var(--brown-medium);
-  /* ללא שינוי במרווחים, justify-content: space-between יטפל בזה */
 }
 
-/* עיצוב הודעות הבזק בחלק העליון של המסך */
 .flash-message {
   position: fixed;
   top: 10px;
@@ -111,7 +108,6 @@
 
 
 
-/* שמירה על הבסיס של חלונית הדיאלוג עם שיפורים */
 .auth-dialog-overlay {
   position: fixed;
   top: 0;
@@ -119,12 +115,12 @@
   right: 0;
   bottom: 0;
   background-color: rgba(35, 34, 33, 0.5);
-  display: flex !important; /* שימוש ב-!important להתגבר על הגדרות אחרות */
+  display: flex !important; 
   align-items: center !important;
   justify-content: center !important;
-  z-index: 99999; /* ערך גבוה יותר */
+  z-index: 99999; 
   backdrop-filter: blur(3px);
-  transition: all 0.3s; /* אנימציה חלקה */
+  transition: all 0.3s; 
 }
 
 .auth-dialog {
@@ -137,9 +133,7 @@
   margin: auto !important;
   max-height: 80vh !important;
   overflow-y: auto;
-  /* מנע הזזה אוטומטית של הדיאלוג למעלה */
   transform: translate(0, 0) !important;
-  /* תוספות מקצועיות */
   border: 1px solid rgba(94, 76, 58, 0.1);
   transition: all 0.3s;
   direction: rtl;
@@ -182,7 +176,6 @@
   transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-/* מצב מיקוד משופר לשדות טופס */
 .form-group input:focus {
   border-color: var(--brown-medium);
   box-shadow: 0 0 0 2px rgba(162, 142, 118, 0.2);
@@ -230,7 +223,6 @@
   background-color: var(--beige-medium);
 }
 
-/* עבור מסכים קטנים */
 @media (max-height: 600px) {
   .auth-dialog {
     max-height: 90vh !important;
