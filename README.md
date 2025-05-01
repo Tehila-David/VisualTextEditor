@@ -105,6 +105,15 @@ The application features a clean, intuitive interface with three main sections:
 4. **Document Management** - Save, close, or delete documents
 
 ## 📸 Screenshots
+### LogIn Page 
+<p align="left">
+<img src="https://github.com/Tehila-David/VisualTextEditor/blob/main/screenshots/login.png" width="80%">
+</p>
+
+### Main Page 
+<p align="left">
+<img src="https://github.com/Tehila-David/VisualTextEditor/blob/main/screenshots/main.png" width="80%">
+</p>
 
 
 
