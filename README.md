@@ -104,6 +104,8 @@ The application features a clean, intuitive interface with three main sections:
 3. **Text Editing** - Add and style text using various formatting options
 4. **Document Management** - Save, close, or delete documents
 
+## 📸 Screenshots
+
 
 
 
